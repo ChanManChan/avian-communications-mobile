@@ -3,6 +3,7 @@ package com.u4.avian.login;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.view.View;
@@ -14,6 +15,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.u4.avian.R;
+import com.u4.avian.signup.SignupActivity;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -59,5 +61,9 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    public void tvSignupClick(View view) {
+        startActivity(new Intent(this, SignupActivity.class));
     }
 }
