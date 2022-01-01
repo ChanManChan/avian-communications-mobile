@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Avian</string>
+    <string name="enter_email">Enter your email address</string>
+    <string name="enter_password">Enter your password</string>
+    <string name="login">Login</string>
+    <string name="reset_password">Reset password</string>
 </resources>
