@@ -12,6 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Avian">
         <activity
+            android:name=".password.ChangePasswordActivity"
+            android:exported="false" />
+        <activity
+            android:name=".profile.ProfileActivity"
+            android:exported="false" />
+        <activity
             android:name=".signup.SignupActivity"
             android:exported="false" />
         <activity
@@ -25,4 +31,5 @@
         </activity>
         <activity android:name=".MainActivity" />
     </application>
+
 </manifest>
