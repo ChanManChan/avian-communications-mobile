@@ -23,6 +23,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
     private TextView tvMessage;
     private LinearLayout llResetPassword, llMessage;
     private Button btnRetry;
+    private View progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +35,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
         llMessage = findViewById(R.id.llMessage);
         llResetPassword = findViewById(R.id.llResetPassword);
         btnRetry = findViewById(R.id.btnRetry);
+        progressBar = findViewById(R.id.progressBar);
     }
 
     public void btnResetPasswordClick(View view) {
@@ -46,10 +48,12 @@ public class ResetPasswordActivity extends AppCompatActivity {
                 return;
             }
 
+            progressBar.setVisibility(View.VISIBLE);
             FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
             firebaseAuth.sendPasswordResetEmail(email).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
+                    progressBar.setVisibility(View.GONE);
                     llResetPassword.setVisibility(View.GONE);
                     llMessage.setVisibility(View.VISIBLE);
 
@@ -69,7 +73,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
                                 btnRetry.setEnabled(true);
                             }
                         }.start();
-                        
+
                         return;
                     }
                     tvMessage.setText(getString(R.string.email_failed, task.getException()));
@@ -78,7 +82,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
         }
     }
 
-    public void btnResetClick(View view) {
+    public void btnRetryClick(View view) {
         llResetPassword.setVisibility(View.VISIBLE);
         llMessage.setVisibility(View.GONE);
     }

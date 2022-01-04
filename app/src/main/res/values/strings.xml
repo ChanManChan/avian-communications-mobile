@@ -24,4 +24,5 @@
     <string name="resend_timer">Retry after: %1$s</string>
     <string name="retry">Retry</string>
     <string name="close">Close</string>
+    <string name="loading">Please wait...</string>
 </resources>

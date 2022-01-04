@@ -23,6 +23,7 @@ import com.u4.avian.signup.SignupActivity;
 public class LoginActivity extends AppCompatActivity {
 
     private TextInputEditText etEmail, etPassword;
+    private View progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,9 +32,11 @@ public class LoginActivity extends AppCompatActivity {
 
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
+        progressBar = findViewById(R.id.progressBar);
     }
 
     public void btnLoginClick(View view) {
+        progressBar.setVisibility(View.VISIBLE);
         Editable emailText = etEmail.getText();
         Editable passwordText = etPassword.getText();
         String email, password;
@@ -47,6 +50,7 @@ public class LoginActivity extends AppCompatActivity {
                 firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
+                        progressBar.setVisibility(View.GONE);
                         if (task.isSuccessful()) {
                             startActivity(new Intent(LoginActivity.this, MainActivity.class));
                             finish();
@@ -56,6 +60,8 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 });
             } else {
+                progressBar.setVisibility(View.GONE);
+
                 if (email.equals("")) {
                     etEmail.setError(getString(R.string.enter_email));
                 }

@@ -18,6 +18,7 @@ import com.u4.avian.R;
 public class ChangePasswordActivity extends AppCompatActivity {
 
     private TextInputEditText etPassword, etConfirmPassword;
+    private View progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,9 +27,11 @@ public class ChangePasswordActivity extends AppCompatActivity {
 
         etPassword = findViewById(R.id.etPassword);
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
+        progressBar = findViewById(R.id.progressBar);
     }
 
     public void btnChangePasswordClick(View view) {
+        progressBar.setVisibility(View.VISIBLE);
         Editable passwordText = etPassword.getText();
         Editable confirmPasswordText = etConfirmPassword.getText();
 
@@ -44,6 +47,7 @@ public class ChangePasswordActivity extends AppCompatActivity {
                     firebaseUser.updatePassword(password).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
+                            progressBar.setVisibility(View.GONE);
                             if (task.isSuccessful()) {
                                 Toast.makeText(ChangePasswordActivity.this, getString(R.string.password_updated), Toast.LENGTH_SHORT).show();
                                 finish();
@@ -54,6 +58,8 @@ public class ChangePasswordActivity extends AppCompatActivity {
                     });
                 }
             } else {
+                progressBar.setVisibility(View.GONE);
+
                 if (password.equals("")) {
                     etPassword.setError(getString(R.string.enter_password));
                 }

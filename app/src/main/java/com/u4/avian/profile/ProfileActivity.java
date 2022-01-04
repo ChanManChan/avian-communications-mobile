@@ -53,6 +53,7 @@ public class ProfileActivity extends AppCompatActivity {
     private StorageReference storageReference;
     private Uri localFileUri, serverFileUri;
     private boolean removePicture = false;
+    private View progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +63,7 @@ public class ProfileActivity extends AppCompatActivity {
         etEmail = findViewById(R.id.etEmail);
         etName = findViewById(R.id.etName);
         ivProfile = findViewById(R.id.ivProfile);
+        progressBar = findViewById(R.id.progressBar);
         storageReference = FirebaseStorage.getInstance().getReference();
         FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser();
@@ -90,14 +92,18 @@ public class ProfileActivity extends AppCompatActivity {
                 return;
             }
 
+            progressBar.setVisibility(View.VISIBLE);
+
             if (localFileUri != null) {
                 updatePhoto();
+                progressBar.setVisibility(View.GONE);
                 return;
             }
 
             if (removePicture) {
                 updateUserDetails("removePhoto");
                 removePicture = false;
+                progressBar.setVisibility(View.GONE);
                 return;
             }
 
@@ -106,6 +112,7 @@ public class ProfileActivity extends AppCompatActivity {
 
             if (!currentName.equals(previousName)) {
                 updateUserDetails("updateName");
+                progressBar.setVisibility(View.GONE);
             }
         }
     }
