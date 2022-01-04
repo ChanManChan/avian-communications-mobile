@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Avian">
         <activity
+            android:name=".password.ResetPasswordActivity"
+            android:exported="false" />
+        <activity
             android:name=".password.ChangePasswordActivity"
             android:exported="false" />
         <activity

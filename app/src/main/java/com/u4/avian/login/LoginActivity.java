@@ -14,8 +14,10 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.u4.avian.MainActivity;
 import com.u4.avian.R;
+import com.u4.avian.password.ResetPasswordActivity;
 import com.u4.avian.signup.SignupActivity;
 
 public class LoginActivity extends AppCompatActivity {
@@ -67,5 +69,21 @@ public class LoginActivity extends AppCompatActivity {
 
     public void tvSignupClick(View view) {
         startActivity(new Intent(this, SignupActivity.class));
+    }
+
+    public void tvResetPasswordClick(View view) {
+        startActivity(new Intent(LoginActivity.this, ResetPasswordActivity.class));
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+
+        if (firebaseUser != null) {
+            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+            finish();
+        }
     }
 }

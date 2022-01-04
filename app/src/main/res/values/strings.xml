@@ -16,4 +16,12 @@
     <string name="remove_picture">Remove Picture</string>
     <string name="profile">Profile</string>
     <string name="change_password">Change Password</string>
+    <string name="password_mismatch">Passwords do not match</string>
+    <string name="password_updated">Password changed successfully</string>
+    <string name="generic_error">Something went wrong: %1$s</string>
+    <string name="reset_password_instructions">Instructions to reset your password has been sent to %1$s</string>
+    <string name="email_failed">Could not send email: %1$s</string>
+    <string name="resend_timer">Retry after: %1$s</string>
+    <string name="retry">Retry</string>
+    <string name="close">Close</string>
 </resources>

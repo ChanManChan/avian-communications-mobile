@@ -8,7 +8,8 @@
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/activity_change_password.xml" value="0.25" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/activity_login.xml" value="0.33" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/activity_main.xml" value="0.33" />
-        <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/activity_profile.xml" value="0.5" />
+        <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/activity_profile.xml" value="0.25" />
+        <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/activity_reset_password.xml" value="0.5" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/activity_signup.xml" value="0.25" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/menu/menu_change_profile_picture.xml" value="0.23981481481481481" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/menu/menu_main.xml" value="0.33" />
