@@ -26,4 +26,11 @@
     <string name="close">Close</string>
     <string name="loading">Please wait...</string>
     <string name="no_internet">Check Internet Connection</string>
+    <string name="chat">Chat</string>
+    <string name="requests">Requests</string>
+    <string name="find">Find</string>
+    <string name="empty_chat_list">Conversations will appear here</string>
+    <string name="empty_find_list">Registered users will appear here</string>
+    <string name="empty_requests_list">Incoming requests will appear here</string>
+    <string name="press_back_to_exit">Press back again to exit the application</string>
 </resources>

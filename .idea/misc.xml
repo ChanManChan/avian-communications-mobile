@@ -14,6 +14,12 @@
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/activity_signup.xml" value="0.25" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/activity_splash.xml" value="0.33" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/custom_progressbar.xml" value="0.33" />
+        <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/fragment_chat.xml" value="0.33" />
+        <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/fragment_find.xml" value="0.2318840579710145" />
+        <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/fragment_requests.xml" value="0.2318840579710145" />
+        <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/tab_chat.xml" value="0.21124620060790272" />
+        <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/tab_find.xml" value="0.21124620060790272" />
+        <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/tab_requests.xml" value="0.21124620060790272" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/menu/menu_change_profile_picture.xml" value="0.23981481481481481" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/menu/menu_main.xml" value="0.33" />
       </map>
