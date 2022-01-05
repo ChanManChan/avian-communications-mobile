@@ -25,4 +25,5 @@
     <string name="retry">Retry</string>
     <string name="close">Close</string>
     <string name="loading">Please wait...</string>
+    <string name="no_internet">Check Internet Connection</string>
 </resources>

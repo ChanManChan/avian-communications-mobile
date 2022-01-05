@@ -50,7 +50,7 @@ public class SignupActivity extends AppCompatActivity {
     private DatabaseReference databaseReference;
     private StorageReference storageReference;
     private Uri localFileUri, serverFileUri;
-    private View progressBar;
+    private View progressBar, constraintLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +63,7 @@ public class SignupActivity extends AppCompatActivity {
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
         ivProfile = findViewById(R.id.ivProfile);
         progressBar = findViewById(R.id.progressBar);
+        constraintLayout = findViewById(R.id.signupConstraintLayout);
         storageReference = FirebaseStorage.getInstance().getReference();
     }
 
@@ -141,12 +142,14 @@ public class SignupActivity extends AppCompatActivity {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     progressBar.setVisibility(View.GONE);
+                                    constraintLayout.setVisibility(View.VISIBLE);
                                     Toast.makeText(SignupActivity.this, "User created successfully", Toast.LENGTH_SHORT).show();
                                     startActivity(new Intent(SignupActivity.this, LoginActivity.class));
                                 }
                             });
                         } else {
                             progressBar.setVisibility(View.GONE);
+                            constraintLayout.setVisibility(View.VISIBLE);
                             Toast.makeText(SignupActivity.this, "Failed to update profile: " + task.getException(), Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -156,6 +159,7 @@ public class SignupActivity extends AppCompatActivity {
     }
 
     public void btnSignupClick(View view) {
+        constraintLayout.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
         Editable emailText = etEmail.getText();
         Editable nameText = etName.getText();
@@ -185,6 +189,7 @@ public class SignupActivity extends AppCompatActivity {
                                 updateUserDetails("usernameOnly");
                             }
                         } else {
+                            constraintLayout.setVisibility(View.VISIBLE);
                             progressBar.setVisibility(View.GONE);
                             Toast.makeText(SignupActivity.this, "Signup failed: " + task.getException(), Toast.LENGTH_SHORT).show();
                         }
@@ -192,6 +197,7 @@ public class SignupActivity extends AppCompatActivity {
                 });
             } else {
                 progressBar.setVisibility(View.GONE);
+                constraintLayout.setVisibility(View.VISIBLE);
 
                 if (!validEmail) {
                     etEmail.setError(getString(R.string.enter_email));

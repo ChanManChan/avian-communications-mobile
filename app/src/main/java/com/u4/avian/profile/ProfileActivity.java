@@ -96,14 +96,12 @@ public class ProfileActivity extends AppCompatActivity {
 
             if (localFileUri != null) {
                 updatePhoto();
-                progressBar.setVisibility(View.GONE);
                 return;
             }
 
             if (removePicture) {
                 updateUserDetails("removePhoto");
                 removePicture = false;
-                progressBar.setVisibility(View.GONE);
                 return;
             }
 
@@ -112,7 +110,6 @@ public class ProfileActivity extends AppCompatActivity {
 
             if (!currentName.equals(previousName)) {
                 updateUserDetails("updateName");
-                progressBar.setVisibility(View.GONE);
             }
         }
     }
@@ -232,11 +229,13 @@ public class ProfileActivity extends AppCompatActivity {
                             databaseReference.child(userID).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
+                                    progressBar.setVisibility(View.GONE);
                                     Toast.makeText(ProfileActivity.this, "User profile updated successfully", Toast.LENGTH_SHORT).show();
                                     finish();
                                 }
                             });
                         } else {
+                            progressBar.setVisibility(View.GONE);
                             Toast.makeText(ProfileActivity.this, "Failed to update profile: " + task.getException(), Toast.LENGTH_SHORT).show();
                         }
                     }

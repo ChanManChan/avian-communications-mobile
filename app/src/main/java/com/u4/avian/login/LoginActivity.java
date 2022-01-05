@@ -1,5 +1,7 @@
 package com.u4.avian.login;
 
+import static com.u4.avian.common.Util.connectionAvailable;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -17,6 +19,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.u4.avian.MainActivity;
 import com.u4.avian.R;
+import com.u4.avian.common.MessageActivity;
 import com.u4.avian.password.ResetPasswordActivity;
 import com.u4.avian.signup.SignupActivity;
 
@@ -45,30 +48,35 @@ public class LoginActivity extends AppCompatActivity {
             email = emailText.toString().trim();
             password = passwordText.toString().trim();
 
-            if (!email.equals("") && !password.equals("")) {
-                FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-                firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        progressBar.setVisibility(View.GONE);
-                        if (task.isSuccessful()) {
-                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                            finish();
-                        } else {
-                            Toast.makeText(LoginActivity.this, "Login failed: " + task.getException(), Toast.LENGTH_SHORT).show();
+            if (connectionAvailable(this)) {
+                if (!email.equals("") && !password.equals("")) {
+                    FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+                    firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            progressBar.setVisibility(View.GONE);
+                            if (task.isSuccessful()) {
+                                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                finish();
+                            } else {
+                                Toast.makeText(LoginActivity.this, "Login failed: " + task.getException(), Toast.LENGTH_SHORT).show();
+                            }
                         }
+                    });
+                } else {
+                    progressBar.setVisibility(View.GONE);
+
+                    if (email.equals("")) {
+                        etEmail.setError(getString(R.string.enter_email));
                     }
-                });
+
+                    if (password.equals("")) {
+                        etPassword.setError(getString(R.string.enter_password));
+                    }
+                }
             } else {
                 progressBar.setVisibility(View.GONE);
-
-                if (email.equals("")) {
-                    etEmail.setError(getString(R.string.enter_email));
-                }
-
-                if (password.equals("")) {
-                    etPassword.setError(getString(R.string.enter_password));
-                }
+                startActivity(new Intent(LoginActivity.this, MessageActivity.class));
             }
         }
     }
