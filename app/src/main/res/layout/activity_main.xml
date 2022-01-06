@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
     tools:context=".MainActivity">
 
     <LinearLayout
@@ -21,8 +20,8 @@
             android:id="@+id/tabMain"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/red_500"
-            app:tabIndicator="@color/white" />
+            android:backgroundTint="#f2f2f2"
+            app:tabIndicator="@color/red_500" />
 
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/vpMain"
