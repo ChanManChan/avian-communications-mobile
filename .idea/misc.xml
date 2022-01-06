@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/kotlin_projects/Avian/app/src/main/res/drawable/card_border.xml" value="0.5755208333333334" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/drawable/ic_chat.xml" value="0.5755208333333334" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/drawable/ic_default_profile.xml" value="0.45989583333333334" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/drawable/ic_find.xml" value="0.5755208333333334" />
@@ -10,13 +11,14 @@
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/drawable/ic_request.xml" value="0.5755208333333334" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/activity_change_password.xml" value="0.25" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/activity_login.xml" value="0.33" />
-        <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/activity_main.xml" value="0.33" />
+        <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/activity_main.xml" value="0.22" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/activity_message.xml" value="0.25" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/activity_profile.xml" value="0.22" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/activity_reset_password.xml" value="0.5" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/activity_signup.xml" value="0.25" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/activity_splash.xml" value="0.33" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/custom_progressbar.xml" value="0.33" />
+        <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/find_layout.xml" value="0.5" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/fragment_chat.xml" value="0.33" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/fragment_find.xml" value="0.2318840579710145" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/fragment_requests.xml" value="0.2318840579710145" />

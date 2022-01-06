@@ -16,7 +16,7 @@ import android.widget.Toast;
 
 import com.google.android.material.tabs.TabLayout;
 import com.u4.avian.fragments.ChatFragment;
-import com.u4.avian.fragments.FindFragment;
+import com.u4.avian.find.FindFragment;
 import com.u4.avian.fragments.RequestsFragment;
 import com.u4.avian.profile.ProfileActivity;
 

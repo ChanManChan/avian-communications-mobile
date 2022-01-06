@@ -33,4 +33,9 @@
     <string name="empty_find_list">Registered users will appear here</string>
     <string name="empty_requests_list">Incoming requests will appear here</string>
     <string name="press_back_to_exit">Press back again to exit the application</string>
+    <string name="send_request">Send Request</string>
+    <string name="cancel_request">Cancel Request</string>
+    <string name="failed_to_fetch_users">Failed to fetch users: %1$s</string>
+    <string name="request_sent_successfully">Request sent successfully</string>
+    <string name="failed_to_send_request">Failed to send request: %1$s</string>
 </resources>
