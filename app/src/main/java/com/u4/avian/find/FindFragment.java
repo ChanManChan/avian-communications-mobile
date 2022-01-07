@@ -1,7 +1,10 @@
 package com.u4.avian.find;
 
+import static com.u4.avian.common.Constants.REQUEST_STATUS_SENT;
 import static com.u4.avian.common.NodeNames.NAME;
 import static com.u4.avian.common.NodeNames.PHOTO;
+import static com.u4.avian.common.NodeNames.REQUESTS;
+import static com.u4.avian.common.NodeNames.REQUEST_TYPE;
 import static com.u4.avian.common.NodeNames.USERS;
 
 import android.os.Bundle;
@@ -33,11 +36,10 @@ import java.util.List;
 
 public class FindFragment extends Fragment {
 
-    private RecyclerView rvFind;
     private FindAdapter findAdapter;
     private List<FindModel> findModelList;
     private TextView tvEmptyUserList;
-    private DatabaseReference databaseReference;
+    private DatabaseReference databaseReferenceRequests;
     private FirebaseUser currentUser;
     private View progressBar;
 
@@ -55,7 +57,7 @@ public class FindFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        rvFind = view.findViewById(R.id.rvFind);
+        RecyclerView rvFind = view.findViewById(R.id.rvFind);
         progressBar = view.findViewById(R.id.progressBar);
         tvEmptyUserList = view.findViewById(R.id.tvEmptyFind);
 
@@ -65,9 +67,9 @@ public class FindFragment extends Fragment {
         findAdapter = new FindAdapter(getActivity(), findModelList);
         rvFind.setAdapter(findAdapter);
 
-        databaseReference = FirebaseDatabase.getInstance().getReference().child(USERS);
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child(USERS);
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
-
+        databaseReferenceRequests = FirebaseDatabase.getInstance().getReference().child(REQUESTS).child(currentUser.getUid());
         progressBar.setVisibility(View.VISIBLE);
 
         Query query = databaseReference.orderByChild(NAME);
@@ -86,18 +88,38 @@ public class FindFragment extends Fragment {
                     Object nameObject = ds.child(NAME).getValue();
                     Object photoObject = ds.child(PHOTO).getValue();
 
-                    if (nameObject != null && photoObject != null) {
+                    if (nameObject != null && photoObject != null && userId != null) {
                         String fullName = nameObject.toString();
                         String photoName = photoObject.toString();
-                        findModelList.add(new FindModel(fullName, photoName, userId, false));
+
+                        databaseReferenceRequests.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if (snapshot.exists()) {
+                                    Object requestTypeObject = snapshot.child(REQUEST_TYPE).getValue();
+                                    if (requestTypeObject != null) {
+                                        String requestType = requestTypeObject.toString();
+                                        if (requestType.equals(REQUEST_STATUS_SENT)) {
+                                            findModelList.add(new FindModel(fullName, photoName, userId, true));
+                                            findAdapter.notifyDataSetChanged();
+                                        }
+                                    }
+                                } else {
+                                    findModelList.add(new FindModel(fullName, photoName, userId, false));
+                                    findAdapter.notifyDataSetChanged();
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+                                progressBar.setVisibility(View.GONE);
+                            }
+                        });
                     }
                 }
 
-                if (findModelList.size() > 0) {
-                    tvEmptyUserList.setVisibility(View.GONE);
-                    progressBar.setVisibility(View.GONE);
-                }
-                findAdapter.notifyDataSetChanged();
+                tvEmptyUserList.setVisibility(View.GONE);
+                progressBar.setVisibility(View.GONE);
             }
 
             @Override

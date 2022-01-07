@@ -38,4 +38,6 @@
     <string name="failed_to_fetch_users">Failed to fetch users: %1$s</string>
     <string name="request_sent_successfully">Request sent successfully</string>
     <string name="failed_to_send_request">Failed to send request: %1$s</string>
+    <string name="request_cancelled_successfully">Request Cancelled Successfully</string>
+    <string name="failed_to_cancel_request">Failed to cancel request: %1$s</string>
 </resources>

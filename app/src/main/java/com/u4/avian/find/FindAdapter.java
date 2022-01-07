@@ -36,8 +36,8 @@ import java.util.List;
 
 public class FindAdapter extends RecyclerView.Adapter<FindAdapter.FindViewHolder> {
 
-    private Context context;
-    private List<FindModel> findModelList;
+    private final Context context;
+    private final List<FindModel> findModelList;
     private DatabaseReference databaseReference;
     private FirebaseUser currentUser;
     private String userId;
@@ -74,10 +74,17 @@ public class FindAdapter extends RecyclerView.Adapter<FindAdapter.FindViewHolder
         databaseReference = FirebaseDatabase.getInstance().getReference().child(REQUESTS);
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
+        if (findModel.isRequestSent()) {
+            holder.btnSendRequest.setVisibility(View.GONE);
+            holder.btnCancelRequest.setVisibility(View.VISIBLE);
+        } else {
+            holder.btnSendRequest.setVisibility(View.VISIBLE);
+            holder.btnCancelRequest.setVisibility(View.GONE);
+        }
+
         holder.btnSendRequest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                holder.btnSendRequest.setEnabled(false);
                 holder.pbRequest.setVisibility(View.VISIBLE);
                 userId = findModel.getUserId();
                 databaseReference.child(currentUser.getUid()).child(userId).child(REQUEST_TYPE).setValue(REQUEST_STATUS_SENT)
@@ -110,6 +117,38 @@ public class FindAdapter extends RecyclerView.Adapter<FindAdapter.FindViewHolder
                         });
             }
         });
+
+        holder.btnCancelRequest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                holder.pbRequest.setVisibility(View.VISIBLE);
+                userId = findModel.getUserId();
+                databaseReference.child(currentUser.getUid()).child(userId).child(REQUEST_TYPE).setValue(null)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    databaseReference.child(userId).child(currentUser.getUid()).child(REQUEST_TYPE).setValue(null).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                                Toast.makeText(context, R.string.request_cancelled_successfully, Toast.LENGTH_SHORT).show();
+                                                holder.btnCancelRequest.setVisibility(View.GONE);
+                                                holder.btnSendRequest.setVisibility(View.VISIBLE);
+                                            } else {
+                                                Toast.makeText(context, context.getString(R.string.failed_to_cancel_request, task.getException()), Toast.LENGTH_SHORT).show();
+                                            }
+                                            holder.pbRequest.setVisibility(View.GONE);
+                                        }
+                                    });
+                                } else {
+                                    Toast.makeText(context, context.getString(R.string.failed_to_cancel_request, task.getException()), Toast.LENGTH_SHORT).show();
+                                    holder.pbRequest.setVisibility(View.GONE);
+                                }
+                            }
+                        });
+            }
+        });
     }
 
     @Override
@@ -117,11 +156,12 @@ public class FindAdapter extends RecyclerView.Adapter<FindAdapter.FindViewHolder
         return findModelList.size();
     }
 
-    public class FindViewHolder extends RecyclerView.ViewHolder {
-        private ImageView ivProfile;
-        private TextView tvFullName;
-        private Button btnSendRequest, btnCancelRequest;
-        private ProgressBar pbRequest;
+    public static class FindViewHolder extends RecyclerView.ViewHolder {
+        private final ImageView ivProfile;
+        private final TextView tvFullName;
+        private final Button btnSendRequest;
+        private final Button btnCancelRequest;
+        private final ProgressBar pbRequest;
 
         public FindViewHolder(@NonNull View itemView) {
             super(itemView);
