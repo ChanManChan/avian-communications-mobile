@@ -67,62 +67,64 @@ public class RequestsFragment extends Fragment {
 
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         databaseReferenceUsers = FirebaseDatabase.getInstance().getReference().child(USERS);
-        DatabaseReference databaseReferenceRequests = FirebaseDatabase.getInstance().getReference().child(REQUESTS).child(currentUser.getUid());
 
-        databaseReferenceRequests.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                progressBar.setVisibility(View.GONE);
-                requestModelList.clear();
-                if (snapshot.getChildrenCount() == 0) {
-                    tvEmptyRequestsList.setVisibility(View.VISIBLE);
-                    requestAdapter.notifyDataSetChanged();
-                    return;
-                }
-                for (DataSnapshot ds : snapshot.getChildren()) {
-                    if (ds.exists()) {
-                        Object requestTypeObject = ds.child(REQUEST_TYPE).getValue();
-                        if (requestTypeObject != null) {
-                            String requestType = requestTypeObject.toString();
-                            if (requestType.equals(REQUEST_STATUS_RECEIVED)) {
-                                String userId = ds.getKey();
-                                if (userId != null) {
-                                    databaseReferenceUsers.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                            Object nameObject = snapshot.child(NAME).getValue();
-                                            Object photoObject = snapshot.child(PHOTO).getValue();
-                                            if (nameObject != null) {
-                                                String userName = nameObject.toString();
-                                                String photoName = "";
-                                                if (photoObject != null) {
-                                                    photoName = photoObject.toString();
+        if (currentUser != null) {
+            DatabaseReference databaseReferenceRequests = FirebaseDatabase.getInstance().getReference().child(REQUESTS).child(currentUser.getUid());
+            databaseReferenceRequests.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    progressBar.setVisibility(View.GONE);
+                    requestModelList.clear();
+                    if (snapshot.getChildrenCount() == 0) {
+                        tvEmptyRequestsList.setVisibility(View.VISIBLE);
+                        requestAdapter.notifyDataSetChanged();
+                        return;
+                    }
+                    for (DataSnapshot ds : snapshot.getChildren()) {
+                        if (ds.exists()) {
+                            Object requestTypeObject = ds.child(REQUEST_TYPE).getValue();
+                            if (requestTypeObject != null) {
+                                String requestType = requestTypeObject.toString();
+                                if (requestType.equals(REQUEST_STATUS_RECEIVED)) {
+                                    String userId = ds.getKey();
+                                    if (userId != null) {
+                                        databaseReferenceUsers.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                Object nameObject = snapshot.child(NAME).getValue();
+                                                Object photoObject = snapshot.child(PHOTO).getValue();
+                                                if (nameObject != null) {
+                                                    String userName = nameObject.toString();
+                                                    String photoName = "";
+                                                    if (photoObject != null) {
+                                                        photoName = photoObject.toString();
+                                                    }
+                                                    RequestModel requestModel = new RequestModel(userId, userName, photoName);
+                                                    requestModelList.add(requestModel);
+                                                    tvEmptyRequestsList.setVisibility(View.GONE);
+                                                    requestAdapter.notifyDataSetChanged();
                                                 }
-                                                RequestModel requestModel = new RequestModel(userId, userName, photoName);
-                                                requestModelList.add(requestModel);
-                                                tvEmptyRequestsList.setVisibility(View.GONE);
-                                                requestAdapter.notifyDataSetChanged();
                                             }
-                                        }
 
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError error) {
-                                            progressBar.setVisibility(View.GONE);
-                                            Toast.makeText(getActivity(), getString(R.string.failed_to_fetch_requests, error.getMessage()), Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError error) {
+                                                progressBar.setVisibility(View.GONE);
+                                                Toast.makeText(getActivity(), getString(R.string.failed_to_fetch_requests, error.getMessage()), Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                progressBar.setVisibility(View.GONE);
-                Toast.makeText(getActivity(), getString(R.string.failed_to_fetch_requests, error.getMessage()), Toast.LENGTH_SHORT).show();
-            }
-        });
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    progressBar.setVisibility(View.GONE);
+                    Toast.makeText(getActivity(), getString(R.string.failed_to_fetch_requests, error.getMessage()), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 }
