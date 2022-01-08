@@ -43,4 +43,7 @@
     <string name="accept">Accept</string>
     <string name="reject">Reject</string>
     <string name="failed_to_fetch_requests">Failed to fetch requests %1$s</string>
+    <string name="failed_to_reject_request">Failed to reject request: %1$s</string>
+    <string name="request_rejected">Request rejected successfully</string>
+    <string name="accepted_request">Accepted request</string>
 </resources>
