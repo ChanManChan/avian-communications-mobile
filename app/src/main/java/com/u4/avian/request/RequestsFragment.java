@@ -33,7 +33,9 @@ import com.google.firebase.database.ValueEventListener;
 import com.u4.avian.R;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class RequestsFragment extends Fragment {
 
@@ -82,8 +84,18 @@ public class RequestsFragment extends Fragment {
                 });
             }
         } else if (requestType.equals(REQUEST_STATUS_ACCEPTED)) {
+            filterList(userId);
             requestAdapter.notifyDataSetChanged();
         }
+    }
+
+    private void filterList(String userId) {
+        List<RequestModel> filteredList = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            filteredList = requestModelList.stream().filter(requestModel -> !requestModel.getUserId().equals(userId)).collect(Collectors.toList());
+        }
+        requestModelList.clear();
+        requestModelList.addAll(filteredList == null ? Collections.emptyList() : filteredList);
     }
 
     @Override
@@ -106,13 +118,13 @@ public class RequestsFragment extends Fragment {
         if (currentUser != null) {
             ChildEventListener childEventListener = new ChildEventListener() {
                 public void onDataChange(@NonNull DataSnapshot snapshot, String operation) {
-                    requestModelList.clear();
+                    String requestType = snapshot.child(REQUEST_TYPE).getValue().toString();
+                    String userId = snapshot.getKey();
                     if (operation.equals("remove")) {
+                        filterList(userId);
                         requestAdapter.notifyDataSetChanged();
                         return;
                     }
-                    String requestType = snapshot.child(REQUEST_TYPE).getValue().toString();
-                    String userId = snapshot.getKey();
                     updateList(requestType, userId);
                 }
 
