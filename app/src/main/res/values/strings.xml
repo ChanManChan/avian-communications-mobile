@@ -46,4 +46,8 @@
     <string name="failed_to_reject_request">Failed to reject request: %1$s</string>
     <string name="request_rejected">Request rejected successfully</string>
     <string name="accepted_request">Accepted request</string>
+    <string name="failed_to_fetch_conversation_list">Failed to fetch conversation list: %1$s</string>
+    <string name="enter_message">Enter Message</string>
+    <string name="failed_to_send_message">Failed to send message: %1$s</string>
+    <string name="message_sent_successfully">Message sent successfully</string>
 </resources>

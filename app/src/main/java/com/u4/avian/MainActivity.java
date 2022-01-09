@@ -15,7 +15,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.google.android.material.tabs.TabLayout;
-import com.u4.avian.fragments.ChatFragment;
+import com.u4.avian.conversations.ConversationFragment;
 import com.u4.avian.find.FindFragment;
 import com.u4.avian.request.RequestsFragment;
 import com.u4.avian.profile.ProfileActivity;
@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
         public Fragment createFragment(int position) {
             switch (position) {
                 case 0:
-                    return new ChatFragment();
+                    return new ConversationFragment();
                 case 1:
                     return new RequestsFragment();
                 case 2:

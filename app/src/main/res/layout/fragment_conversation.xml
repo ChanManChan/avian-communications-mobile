@@ -4,10 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.ChatFragment">
+    tools:context=".conversations.ConversationFragment">
+
+    <include
+        android:id="@+id/progressBar"
+        layout="@layout/custom_progressbar"
+        android:visibility="gone" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvChats"
+        android:id="@+id/rvConversations"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -19,7 +24,7 @@
     </androidx.recyclerview.widget.RecyclerView>
 
     <TextView
-        android:id="@+id/tvEmptyChat"
+        android:id="@+id/tvEmptyConversationList"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/empty_chat_list"
