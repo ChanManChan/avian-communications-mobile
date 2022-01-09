@@ -1,4 +1,4 @@
-package com.u4.avian;
+package com.u4.avian.conversations;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,6 +15,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
+import com.u4.avian.R;
 import com.u4.avian.common.Constants;
 import com.u4.avian.common.NodeNames;
 import com.u4.avian.common.Util;

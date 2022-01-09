@@ -15,7 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Avian">
         <activity
-            android:name=".ConversationActivity"
+            android:name=".conversations.ConversationActivity"
             android:exported="false" />
         <activity
             android:name=".common.SplashActivity"

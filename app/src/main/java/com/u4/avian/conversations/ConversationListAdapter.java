@@ -19,7 +19,6 @@ import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.u4.avian.ConversationActivity;
 import com.u4.avian.R;
 import com.u4.avian.common.Constants;
 
