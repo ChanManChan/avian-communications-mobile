@@ -14,7 +14,7 @@ public class NodeNames {
     public static final String TIMESTAMP = "timestamp";
     public static final String MESSAGE_ID = "messageId";
     public static final String MESSAGE = "message";
-    public static final String MESSAGE_TYPE = "type";
-    public static final String MESSAGE_FROM = "from";
-    public static final String MESSAGE_TIME = "time";
+    public static final String MESSAGE_TYPE = "messageType";
+    public static final String MESSAGE_FROM = "messageFrom";
+    public static final String MESSAGE_TIME = "messageTime";
 }
