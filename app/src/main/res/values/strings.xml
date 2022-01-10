@@ -50,4 +50,7 @@
     <string name="enter_message">Enter Message</string>
     <string name="failed_to_send_message">Failed to send message: %1$s</string>
     <string name="message_sent_successfully">Message sent successfully</string>
+    <string name="camera">Camera</string>
+    <string name="gallery">Gallery</string>
+    <string name="video">Video</string>
 </resources>
