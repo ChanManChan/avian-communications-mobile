@@ -1,9 +1,14 @@
 package com.u4.avian.conversations;
 
+import static com.u4.avian.common.Constants.MESSAGE_TYPE_TEXT;
+
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -11,8 +16,10 @@ import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.u4.avian.R;
+import com.u4.avian.common.Constants;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -47,16 +54,63 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         String messageTime = splitString[1];
 
         if (fromUserId.equals(currentUserId)) {
-            holder.llSent.setVisibility(View.VISIBLE);
+            if (messageModel.getMessageType().equals(MESSAGE_TYPE_TEXT)) {
+                holder.llSent.setVisibility(View.VISIBLE);
+                holder.llSentImage.setVisibility(View.GONE);
+                holder.tvSentMessage.setText(messageModel.getMessage());
+                holder.tvSentMessageTime.setText(messageTime);
+            } else {
+                holder.llSent.setVisibility(View.GONE);
+                holder.llSentImage.setVisibility(View.VISIBLE);
+                holder.tvSentImageTime.setText(messageTime);
+                Glide.with(context)
+                        .load(messageModel.getMessage())
+                        .placeholder(R.drawable.ic_default_image)
+                        .error(R.drawable.ic_default_image)
+                        .into(holder.ivSent);
+            }
             holder.llReceived.setVisibility(View.GONE);
-            holder.tvSentMessage.setText(messageModel.getMessage());
-            holder.tvSentMessageTime.setText(messageTime);
+            holder.llReceivedImage.setVisibility(View.GONE);
         } else {
-            holder.llReceived.setVisibility(View.VISIBLE);
+            if (messageModel.getMessageType().equals(MESSAGE_TYPE_TEXT)) {
+                holder.llReceived.setVisibility(View.VISIBLE);
+                holder.llReceivedImage.setVisibility(View.GONE);
+                holder.tvReceivedMessage.setText(messageModel.getMessage());
+                holder.tvReceivedMessageTime.setText(messageTime);
+            } else {
+                holder.llReceived.setVisibility(View.GONE);
+                holder.llReceivedImage.setVisibility(View.VISIBLE);
+                holder.tvReceivedImageTime.setText(messageTime);
+                Glide.with(context)
+                        .load(messageModel.getMessage())
+                        .placeholder(R.drawable.ic_default_image_alt)
+                        .error(R.drawable.ic_default_image_alt)
+                        .into(holder.ivReceived);
+            }
             holder.llSent.setVisibility(View.GONE);
-            holder.tvReceivedMessage.setText(messageModel.getMessage());
-            holder.tvReceivedMessageTime.setText(messageTime);
+            holder.llSentImage.setVisibility(View.GONE);
         }
+
+        holder.clMessage.setTag(R.id.TAG_MESSAGE, messageModel.getMessage());
+        holder.clMessage.setTag(R.id.TAG_MESSAGE_ID, messageModel.getMessageId());
+        holder.clMessage.setTag(R.id.TAG_MESSAGE_TYPE, messageModel.getMessageType());
+
+        holder.clMessage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String messageType = view.getTag(R.id.TAG_MESSAGE_TYPE).toString();
+                Uri uri = Uri.parse(view.getTag(R.id.TAG_MESSAGE).toString());
+                if (messageType.equals(Constants.MESSAGE_TYPE_VIDEO)) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                    intent.setDataAndType(uri, "video/mp4");
+                    context.startActivity(intent);
+                } else if (messageType.equals(Constants.MESSAGE_TYPE_IMAGE)) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                    intent.setDataAndType(uri, "image/jpg");
+                    context.startActivity(intent);
+                }
+            }
+        });
     }
 
     @Override
@@ -67,10 +121,16 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     public static class MessageViewHolder extends RecyclerView.ViewHolder {
         private final LinearLayout llSent;
         private final LinearLayout llReceived;
+        private final LinearLayout llSentImage;
+        private final LinearLayout llReceivedImage;
+        private final ImageView ivSent;
+        private final ImageView ivReceived;
         private final TextView tvSentMessage;
         private final TextView tvSentMessageTime;
+        private final TextView tvSentImageTime;
         private final TextView tvReceivedMessage;
         private final TextView tvReceivedMessageTime;
+        private final TextView tvReceivedImageTime;
         private final ConstraintLayout clMessage;
 
         public MessageViewHolder(@NonNull View itemView) {
@@ -82,6 +142,12 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             tvReceivedMessage = itemView.findViewById(R.id.tvReceivedMessage);
             tvReceivedMessageTime = itemView.findViewById(R.id.tvReceivedMessageTime);
             clMessage = itemView.findViewById(R.id.clMessage);
+            llSentImage = itemView.findViewById(R.id.llSentImageContainer);
+            llReceivedImage = itemView.findViewById(R.id.llReceivedImageContainer);
+            ivSent = itemView.findViewById(R.id.ivSentImage);
+            ivReceived = itemView.findViewById(R.id.ivReceivedImage);
+            tvSentImageTime = itemView.findViewById(R.id.tvSentImageTime);
+            tvReceivedImageTime = itemView.findViewById(R.id.tvReceivedImageTime);
         }
     }
 }

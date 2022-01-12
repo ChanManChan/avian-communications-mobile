@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/clMessage"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="#f2f2f2">
 
     <LinearLayout
         android:id="@+id/llSentContainer"
@@ -59,6 +60,54 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/llSentImageContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="8dp"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/llSentContainer"
+        tools:visibility="visible">
+
+        <LinearLayout
+            android:id="@+id/llSentImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="0dp"
+            android:background="@drawable/sent_chat_bubble"
+            android:orientation="horizontal"
+            android:paddingBottom="8dp">
+
+            <ImageView
+                android:id="@+id/ivSentImage"
+                android:layout_width="90dp"
+                android:layout_height="100dp"
+                android:src="@drawable/ic_default_image" />
+
+            <TextView
+                android:id="@+id/tvSentImageTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_marginEnd="6dp"
+                android:textColor="@color/white"
+                android:textSize="10sp"
+                tools:text="09:00" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/ivSentImageBubbleCorner"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="bottom"
+            app:srcCompat="@drawable/sent_chat_bubble_corner" />
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/llReceivedContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -106,6 +155,55 @@
                 android:padding="12dp"
                 android:textColor="@color/red_700"
                 tools:text="Hello Chan" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llReceivedImageContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="4dp"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/llReceivedContainer"
+        tools:visibility="visible">
+
+        <ImageView
+            android:id="@+id/ivReceivedImageBubbleCorner"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="bottom"
+            app:srcCompat="@drawable/received_chat_bubble_corner" />
+
+        <LinearLayout
+            android:id="@+id/llReceivedImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="0dp"
+            android:background="@drawable/received_chat_bubble"
+            android:orientation="horizontal"
+            android:paddingBottom="8dp">
+
+            <TextView
+                android:id="@+id/tvReceivedImageTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_marginStart="6dp"
+                android:autoLink="all"
+                android:textColor="@color/red_700"
+                android:textColorLink="@color/green_200"
+                android:textSize="10sp"
+                tools:text="09:00" />
+
+            <ImageView
+                android:id="@+id/ivReceivedImage"
+                android:layout_width="90dp"
+                android:layout_height="100dp"
+                android:src="@drawable/ic_default_image_alt" />
         </LinearLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

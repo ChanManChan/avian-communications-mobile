@@ -1,5 +1,6 @@
 package com.u4.avian.profile;
 
+import static com.u4.avian.common.Constants.PROFILE_IMAGES_FOLDER;
 import static com.u4.avian.common.NodeNames.EMAIL;
 import static com.u4.avian.common.NodeNames.NAME;
 import static com.u4.avian.common.NodeNames.ONLINE;
@@ -163,7 +164,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void updatePhoto() {
         String fileName = firebaseUser.getUid() + ".jpg";
-        StorageReference fileRef = storageReference.child("images/" + fileName);
+        StorageReference fileRef = storageReference.child(PROFILE_IMAGES_FOLDER + fileName);
         fileRef.putFile(localFileUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {

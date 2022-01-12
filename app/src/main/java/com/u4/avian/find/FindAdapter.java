@@ -59,7 +59,7 @@ public class FindAdapter extends RecyclerView.Adapter<FindAdapter.FindViewHolder
         FindModel findModel = findModelList.get(position);
         holder.tvFullName.setText(findModel.getUserName());
         String photoName = findModel.getPhotoName();
-        StorageReference fileRef = FirebaseStorage.getInstance().getReference().child(PROFILE_IMAGES_FOLDER + photoName.substring(photoName.lastIndexOf("/")));
+        StorageReference fileRef = FirebaseStorage.getInstance().getReference().child(PROFILE_IMAGES_FOLDER + (!photoName.equals("") ? photoName.substring(photoName.lastIndexOf("/")) : ""));
         fileRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
