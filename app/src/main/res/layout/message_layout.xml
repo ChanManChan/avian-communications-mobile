@@ -35,7 +35,7 @@
                 android:autoLink="all"
                 android:padding="12dp"
                 android:textColor="@color/white"
-                android:textColorLink="@color/green_200"
+                android:textColorLink="@color/white"
                 tools:text="Hi Nandu" />
 
             <TextView

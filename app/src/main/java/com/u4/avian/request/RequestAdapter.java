@@ -1,6 +1,6 @@
 package com.u4.avian.request;
 
-import static com.u4.avian.common.Constants.IMAGES_FOLDER;
+import static com.u4.avian.common.Constants.PROFILE_IMAGES_FOLDER;
 import static com.u4.avian.common.NodeNames.REQUESTS;
 import static com.u4.avian.common.NodeNames.REQUEST_TYPE;
 
@@ -64,7 +64,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         RequestModel requestModel = requestModelList.get(position);
         holder.tvFullName.setText(requestModel.getUserName());
         String photoName = requestModel.getPhotoName();
-        StorageReference fileRef = FirebaseStorage.getInstance().getReference().child(IMAGES_FOLDER + photoName.substring(photoName.lastIndexOf("/")));
+        StorageReference fileRef = FirebaseStorage.getInstance().getReference().child(PROFILE_IMAGES_FOLDER + photoName.substring(photoName.lastIndexOf("/")));
         fileRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {

@@ -1,6 +1,6 @@
 package com.u4.avian.find;
 
-import static com.u4.avian.common.Constants.IMAGES_FOLDER;
+import static com.u4.avian.common.Constants.PROFILE_IMAGES_FOLDER;
 import static com.u4.avian.common.Constants.REQUEST_STATUS_RECEIVED;
 import static com.u4.avian.common.Constants.REQUEST_STATUS_SENT;
 import static com.u4.avian.common.NodeNames.REQUESTS;
@@ -59,7 +59,7 @@ public class FindAdapter extends RecyclerView.Adapter<FindAdapter.FindViewHolder
         FindModel findModel = findModelList.get(position);
         holder.tvFullName.setText(findModel.getUserName());
         String photoName = findModel.getPhotoName();
-        StorageReference fileRef = FirebaseStorage.getInstance().getReference().child(IMAGES_FOLDER + photoName.substring(photoName.lastIndexOf("/")));
+        StorageReference fileRef = FirebaseStorage.getInstance().getReference().child(PROFILE_IMAGES_FOLDER + photoName.substring(photoName.lastIndexOf("/")));
         fileRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {

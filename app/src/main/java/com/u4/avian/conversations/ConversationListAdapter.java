@@ -1,6 +1,6 @@
 package com.u4.avian.conversations;
 
-import static com.u4.avian.common.Constants.IMAGES_FOLDER;
+import static com.u4.avian.common.Constants.PROFILE_IMAGES_FOLDER;
 
 import android.content.Context;
 import android.content.Intent;
@@ -46,7 +46,7 @@ public class ConversationListAdapter extends RecyclerView.Adapter<ConversationLi
         ConversationListModel conversationListModel = conversationListModelList.get(position);
         holder.tvFullName.setText(conversationListModel.getUserName());
         String photoName = conversationListModel.getPhotoName();
-        StorageReference fileRef = FirebaseStorage.getInstance().getReference().child(IMAGES_FOLDER + (!photoName.equals("") ? photoName.substring(photoName.lastIndexOf("/")) : ""));
+        StorageReference fileRef = FirebaseStorage.getInstance().getReference().child(PROFILE_IMAGES_FOLDER + (!photoName.equals("") ? photoName.substring(photoName.lastIndexOf("/")) : ""));
         fileRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {

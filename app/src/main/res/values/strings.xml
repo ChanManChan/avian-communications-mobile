@@ -53,4 +53,6 @@
     <string name="camera">Camera</string>
     <string name="gallery">Gallery</string>
     <string name="video">Video</string>
+    <string name="upload_progress">Uploading %1$s (%2$s %%)</string>
+    <string name="failed_to_upload">Failed to upload: %1$s</string>
 </resources>
