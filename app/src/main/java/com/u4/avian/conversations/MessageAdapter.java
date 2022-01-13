@@ -178,6 +178,12 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
             MenuInflater inflater = actionMode.getMenuInflater();
             inflater.inflate(R.menu.menu_conversation_options, menu);
+            String selectedMessageType = selectedView.getTag(R.id.TAG_MESSAGE_TYPE).toString();
+            if (selectedMessageType.equals(MESSAGE_TYPE_TEXT)) {
+                MenuItem itemDownload = menu.findItem(R.id.menuDownload);
+                itemDownload.setVisible(false);
+            }
+
             return true;
         }
 
@@ -189,7 +195,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         @Override
         public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
             String selectedMessageId = selectedView.getTag(R.id.TAG_MESSAGE_ID).toString();
-            // String selectedMessage = selectedView.getTag(R.id.TAG_MESSAGE).toString();
+            String selectedMessage = selectedView.getTag(R.id.TAG_MESSAGE).toString();
             String selectedMessageType = selectedView.getTag(R.id.TAG_MESSAGE_TYPE).toString();
             int itemId = menuItem.getItemId();
 
@@ -197,13 +203,21 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 case R.id.menuDelete:
                     if (context instanceof ConversationActivity) {
                         ((ConversationActivity) context).deleteMessage(selectedMessageId, selectedMessageType);
-                        int color = context.getResources().getColor(R.color.grey);
-                        selectedView.setBackgroundColor(color);
                     }
                     actionMode.finish();
                     break;
                 case R.id.menuShare:
-                    Toast.makeText(context, "Share Option Clicked", Toast.LENGTH_SHORT).show();
+                    if (selectedMessageType.equals(MESSAGE_TYPE_TEXT)) {
+                        Intent intentShare = new Intent();
+                        intentShare.setAction(Intent.ACTION_SEND);
+                        intentShare.putExtra(Intent.EXTRA_TEXT, selectedMessage);
+                        intentShare.setType("text/plain");
+                        context.startActivity(intentShare);
+                    } else {
+                        if (context instanceof ConversationActivity) {
+                            ((ConversationActivity) context).downloadFile(selectedMessageId, selectedMessageType, true);
+                        }
+                    }
                     actionMode.finish();
                     break;
                 case R.id.menuForward:
@@ -211,7 +225,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                     actionMode.finish();
                     break;
                 case R.id.menuDownload:
-                    Toast.makeText(context, "Download Option Clicked", Toast.LENGTH_SHORT).show();
+                    if (context instanceof ConversationActivity) {
+                        ((ConversationActivity) context).downloadFile(selectedMessageId, selectedMessageType, false);
+                    }
                     actionMode.finish();
                     break;
                 default:
@@ -223,6 +239,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         @Override
         public void onDestroyActionMode(ActionMode actionMode) {
             actionMode = null;
+            int color = context.getResources().getColor(R.color.grey);
+            selectedView.setBackgroundColor(color);
         }
     };
 }

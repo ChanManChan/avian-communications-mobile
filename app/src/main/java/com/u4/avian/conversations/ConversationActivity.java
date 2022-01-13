@@ -31,6 +31,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.view.MenuItem;
@@ -50,6 +51,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -58,6 +60,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
+import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
@@ -67,6 +70,8 @@ import com.u4.avian.common.Constants;
 import com.u4.avian.common.NodeNames;
 import com.u4.avian.common.Util;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -476,5 +481,110 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                 }
             }
         });
+    }
+
+    public void downloadFile(String messageId, String messageType, boolean isShare) {
+        if (hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            String folderName = messageType.equals(MESSAGE_TYPE_VIDEO) ? MESSAGE_VIDEOS_FOLDER : MESSAGE_IMAGES_FOLDER;
+            String fileName = messageId + (messageType.equals(MESSAGE_TYPE_VIDEO) ? ".mp4" : ".jpg");
+            StorageReference fileRef = FirebaseStorage.getInstance().getReference().child(folderName).child(fileName);
+            String localFilePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + "/" + fileName.substring(1);
+//            String localFilePath = getExternalFilesDir(null).getAbsolutePath() + "/" + fileName;
+            File localFile = new File(localFilePath);
+            try {
+                if (localFile.exists() || localFile.createNewFile()) {
+                    FileDownloadTask downloadTask = fileRef.getFile(localFile);
+                    View view = getLayoutInflater().inflate(R.layout.file_progress, null);
+                    ProgressBar pbProgress = view.findViewById(R.id.pbProgress);
+                    TextView tvProgress = view.findViewById(R.id.tvFileProgress);
+                    ImageView ivPlay = view.findViewById(R.id.ivPlay);
+                    ImageView ivPause = view.findViewById(R.id.ivPause);
+                    ImageView ivCancel = view.findViewById(R.id.ivCancel);
+
+                    ivPause.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            downloadTask.pause();
+                            ivPlay.setVisibility(View.VISIBLE);
+                            ivPause.setVisibility(View.GONE);
+                        }
+                    });
+
+                    ivPlay.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            downloadTask.resume();
+                            ivPlay.setVisibility(View.GONE);
+                            ivPause.setVisibility(View.VISIBLE);
+                        }
+                    });
+
+                    ivCancel.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            downloadTask.cancel();
+                        }
+                    });
+
+                    llProgress.addView(view);
+                    tvProgress.setText(getString(R.string.download_progress, messageType, "0"));
+
+                    downloadTask.addOnProgressListener(new OnProgressListener<FileDownloadTask.TaskSnapshot>() {
+                        @Override
+                        public void onProgress(@NonNull FileDownloadTask.TaskSnapshot snapshot) {
+                            double progress = ((double) snapshot.getBytesTransferred() / snapshot.getTotalByteCount()) * 100.0;
+                            pbProgress.setProgress((int) progress);
+                            tvProgress.setText(getString(R.string.download_progress, messageType, String.valueOf(pbProgress.getProgress())));
+                        }
+                    });
+
+                    downloadTask.addOnCompleteListener(new OnCompleteListener<FileDownloadTask.TaskSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<FileDownloadTask.TaskSnapshot> task) {
+                            llProgress.removeView(view);
+                            if (task.isSuccessful()) {
+                                if (isShare) {
+                                    Intent intentShare = new Intent(Intent.ACTION_SEND);
+                                    intentShare.putExtra(Intent.EXTRA_STREAM, Uri.parse(localFilePath));
+                                    intentShare.setType(messageType.equals(MESSAGE_TYPE_VIDEO) ? "video/mp4" : "image/jpg");
+                                    startActivity(intentShare);
+                                } else {
+                                    Snackbar snackbar = Snackbar.make(llProgress, getString(R.string.file_downloaded_successfully), Snackbar.LENGTH_LONG);
+                                    snackbar.setAction(R.string.view, new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            Uri uri = Uri.parse(localFilePath);
+                                            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                                            if (messageType.equals(MESSAGE_TYPE_VIDEO)) {
+                                                intent.setDataAndType(uri, "video/mp4");
+                                            } else if (messageType.equals(MESSAGE_TYPE_IMAGE)) {
+                                                intent.setDataAndType(uri, "image/jpg");
+                                            }
+                                            startActivity(intent);
+                                        }
+                                    });
+                                    snackbar.show();
+                                }
+                            }
+                        }
+                    });
+
+                    downloadTask.addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            llProgress.removeView(view);
+                            Toast.makeText(ConversationActivity.this, getString(R.string.failed_to_download, e.getMessage()), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } else {
+                    Toast.makeText(this, getString(R.string.failed_to_store_file), Toast.LENGTH_SHORT).show();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                Toast.makeText(ConversationActivity.this, getString(R.string.failed_to_download, e.getMessage()), Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2);
+        }
     }
 }
