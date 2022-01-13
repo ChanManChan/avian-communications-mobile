@@ -13,6 +13,8 @@ public class Constants {
     public static final String MESSAGE_TYPE_IMAGE = "image";
     public static final String MESSAGE_TYPE_VIDEO = "video";
 
-    public static final String USER_KEY = "user_key";
     public static final String REQUEST_CODE = "request_code";
+    public static final String USER_KEY = "user_key";
+    public static final String USER_NAME = "user_name";
+    public static final String PROFILE_PICTURE = "profile_picture";
 }

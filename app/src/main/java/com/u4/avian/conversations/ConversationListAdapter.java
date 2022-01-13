@@ -63,6 +63,8 @@ public class ConversationListAdapter extends RecyclerView.Adapter<ConversationLi
             public void onClick(View view) {
                 Intent intent = new Intent(context, ConversationActivity.class);
                 intent.putExtra(Constants.USER_KEY, conversationListModel.getUserId());
+                intent.putExtra(Constants.USER_NAME, conversationListModel.getUserName());
+                intent.putExtra(Constants.PROFILE_PICTURE, conversationListModel.getPhotoName());
                 context.startActivity(intent);
             }
         });

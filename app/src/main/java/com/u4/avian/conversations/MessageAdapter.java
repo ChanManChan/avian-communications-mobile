@@ -6,13 +6,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -29,6 +35,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
     private final Context context;
     private final List<MessageModel> messageModelList;
+    private ActionMode actionMode;
+    private ConstraintLayout selectedView;
 
     public MessageAdapter(Context context, List<MessageModel> messageModelList) {
         this.context = context;
@@ -111,6 +119,20 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 }
             }
         });
+
+        holder.clMessage.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                if (actionMode != null) {
+                    return false;
+                }
+                selectedView = holder.clMessage;
+                actionMode = ((AppCompatActivity) context).startSupportActionMode(actionModeCallback);
+                int color = context.getResources().getColor(R.color.red_200);
+                holder.clMessage.setBackgroundColor(color);
+                return true;
+            }
+        });
     }
 
     @Override
@@ -150,4 +172,57 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             tvReceivedImageTime = itemView.findViewById(R.id.tvReceivedImageTime);
         }
     }
+
+    public ActionMode.Callback actionModeCallback = new ActionMode.Callback() {
+        @Override
+        public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+            MenuInflater inflater = actionMode.getMenuInflater();
+            inflater.inflate(R.menu.menu_conversation_options, menu);
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+            String selectedMessageId = selectedView.getTag(R.id.TAG_MESSAGE_ID).toString();
+            // String selectedMessage = selectedView.getTag(R.id.TAG_MESSAGE).toString();
+            String selectedMessageType = selectedView.getTag(R.id.TAG_MESSAGE_TYPE).toString();
+            int itemId = menuItem.getItemId();
+
+            switch (itemId) {
+                case R.id.menuDelete:
+                    if (context instanceof ConversationActivity) {
+                        ((ConversationActivity) context).deleteMessage(selectedMessageId, selectedMessageType);
+                        int color = context.getResources().getColor(R.color.grey);
+                        selectedView.setBackgroundColor(color);
+                    }
+                    actionMode.finish();
+                    break;
+                case R.id.menuShare:
+                    Toast.makeText(context, "Share Option Clicked", Toast.LENGTH_SHORT).show();
+                    actionMode.finish();
+                    break;
+                case R.id.menuForward:
+                    Toast.makeText(context, "Forward Option Clicked", Toast.LENGTH_SHORT).show();
+                    actionMode.finish();
+                    break;
+                case R.id.menuDownload:
+                    Toast.makeText(context, "Download Option Clicked", Toast.LENGTH_SHORT).show();
+                    actionMode.finish();
+                    break;
+                default:
+                    break;
+            }
+            return false;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode actionMode) {
+            actionMode = null;
+        }
+    };
 }

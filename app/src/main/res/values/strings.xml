@@ -55,4 +55,11 @@
     <string name="video">Video</string>
     <string name="upload_progress">Uploading %1$s (%2$s %%)</string>
     <string name="failed_to_upload">Failed to upload: %1$s</string>
+    <string name="forward">Forward</string>
+    <string name="delete">Delete</string>
+    <string name="share">Share</string>
+    <string name="download">Download</string>
+    <string name="failed_to_delete_message">Failed to delete message: %1$s</string>
+    <string name="message_deleted_successfully">Message deleted successfully</string>
+    <string name="failed_to_delete_file">Failed to delete file: %1$s</string>
 </resources>

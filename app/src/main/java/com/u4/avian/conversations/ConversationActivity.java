@@ -4,6 +4,7 @@ import static android.provider.MediaStore.ACTION_IMAGE_CAPTURE;
 
 import static com.u4.avian.common.Constants.MESSAGE_IMAGES_FOLDER;
 import static com.u4.avian.common.Constants.MESSAGE_TYPE_IMAGE;
+import static com.u4.avian.common.Constants.MESSAGE_TYPE_TEXT;
 import static com.u4.avian.common.Constants.MESSAGE_TYPE_VIDEO;
 import static com.u4.avian.common.Constants.MESSAGE_VIDEOS_FOLDER;
 import static com.u4.avian.common.NodeNames.MESSAGES;
@@ -16,6 +17,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -30,7 +32,10 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.TextUtils;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -39,6 +44,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -89,8 +95,21 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_conversation);
 
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle("");
+            ViewGroup actionBarLayout = (ViewGroup) getLayoutInflater().inflate(R.layout.custom_action_bar, null);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeButtonEnabled(true);
+            actionBar.setElevation(0);
+            actionBar.setCustomView(actionBarLayout);
+            actionBar.setDisplayOptions(actionBar.getDisplayOptions() | ActionBar.DISPLAY_SHOW_CUSTOM);
+        }
+
         ImageView ivSend = findViewById(R.id.ivSend);
         ImageView ivAttachment = findViewById(R.id.ivAttachment);
+        ImageView ivProfile = findViewById(R.id.ivProfile);
+        TextView tvUserName = findViewById(R.id.tvUserName);
         etMessage = findViewById(R.id.etMessage);
         llProgress = findViewById(R.id.llProgress);
 
@@ -102,6 +121,27 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
 
         if (getIntent().hasExtra(Constants.USER_KEY)) {
             chatUserId = getIntent().getStringExtra(Constants.USER_KEY);
+        }
+
+        if (getIntent().hasExtra(Constants.USER_NAME)) {
+            tvUserName.setText(getIntent().getStringExtra(Constants.USER_NAME));
+        }
+
+        if (getIntent().hasExtra(Constants.PROFILE_PICTURE)) {
+            String photoName = getIntent().getStringExtra(Constants.PROFILE_PICTURE);
+            if (!TextUtils.isEmpty(photoName)) {
+                StorageReference photoRef = FirebaseStorage.getInstance().getReference().child(Constants.PROFILE_IMAGES_FOLDER).child(photoName.substring(photoName.lastIndexOf("/")));
+                photoRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        Glide.with(ConversationActivity.this)
+                                .load(uri)
+                                .placeholder(R.drawable.ic_default_profile)
+                                .error(R.drawable.ic_default_profile)
+                                .into(ivProfile);
+                    }
+                });
+            }
         }
 
         rvMessages = findViewById(R.id.rvMessages);
@@ -156,7 +196,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-
+                loadMessages();
             }
 
             @Override
@@ -385,5 +425,56 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                 Toast.makeText(this, "Permission required to access files", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int itemId = item.getItemId();
+        switch (itemId) {
+            case android.R.id.home:
+                finish();
+                break;
+            default:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void deleteMessage(String messageId, String messageType) {
+        DatabaseReference databaseReferenceCurrentUser = rootRef.child(MESSAGES).child(currentUserId).child(chatUserId).child(messageId);
+        DatabaseReference databaseReferenceChatUser = rootRef.child(MESSAGES).child(chatUserId).child(currentUserId).child(messageId);
+        databaseReferenceCurrentUser.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    databaseReferenceChatUser.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(ConversationActivity.this, getString(R.string.message_deleted_successfully), Toast.LENGTH_SHORT).show();
+                                if (!messageType.equals(MESSAGE_TYPE_TEXT)) {
+                                    StorageReference storageReference = FirebaseStorage.getInstance().getReference();
+                                    String folder = messageType.equals(MESSAGE_TYPE_VIDEO) ? MESSAGE_VIDEOS_FOLDER : MESSAGE_IMAGES_FOLDER;
+                                    String fileName = messageId + (messageType.equals(MESSAGE_TYPE_VIDEO) ? ".mp4" : ".jpg");
+                                    StorageReference fileRef = storageReference.child(folder).child(fileName);
+                                    fileRef.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (!task.isSuccessful()) {
+                                                Toast.makeText(ConversationActivity.this, getString(R.string.failed_to_delete_file, task.getException()), Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    });
+                                }
+                            } else {
+                                Toast.makeText(ConversationActivity.this, getString(R.string.failed_to_delete_message, task.getException()), Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                } else {
+                    Toast.makeText(ConversationActivity.this, getString(R.string.failed_to_delete_message, task.getException()), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 }

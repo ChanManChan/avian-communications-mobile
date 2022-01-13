@@ -11,12 +11,17 @@
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/drawable/ic_default_image.xml" value="0.42083333333333334" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/drawable/ic_default_image_alt.xml" value="0.41435897435897434" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/drawable/ic_default_profile.xml" value="0.45989583333333334" />
+        <entry key="..\:/kotlin_projects/Avian/app/src/main/res/drawable/ic_default_profile_alt.xml" value="0.41435897435897434" />
+        <entry key="..\:/kotlin_projects/Avian/app/src/main/res/drawable/ic_delete.xml" value="0.5755208333333334" />
+        <entry key="..\:/kotlin_projects/Avian/app/src/main/res/drawable/ic_download.xml" value="0.5755208333333334" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/drawable/ic_find.xml" value="0.5755208333333334" />
+        <entry key="..\:/kotlin_projects/Avian/app/src/main/res/drawable/ic_forward.xml" value="0.5755208333333334" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/drawable/ic_gallery.xml" value="0.4111111111111111" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/drawable/ic_pause.xml" value="0.41435897435897434" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/drawable/ic_profile.xml" value="0.37037037037037035" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/drawable/ic_request.xml" value="0.5755208333333334" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/drawable/ic_send.xml" value="0.3861111111111111" />
+        <entry key="..\:/kotlin_projects/Avian/app/src/main/res/drawable/ic_share.xml" value="0.5755208333333334" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/drawable/ic_video.xml" value="0.4111111111111111" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/drawable/received_chat_bubble.xml" value="0.3861111111111111" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/drawable/received_chat_bubble_corner.xml" value="0.3861111111111111" />
@@ -28,13 +33,14 @@
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/activity_login.xml" value="0.33" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/activity_main.xml" value="0.22" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/activity_message.xml" value="0.25" />
-        <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/activity_profile.xml" value="0.22" />
+        <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/activity_profile.xml" value="0.33" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/activity_reset_password.xml" value="0.5" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/activity_signup.xml" value="0.25" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/activity_splash.xml" value="0.33" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/chat_file_options.xml" value="0.33" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/chat_layout.xml" value="0.20871327254305977" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/conversation_layout.xml" value="0.33" />
+        <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/custom_action_bar.xml" value="0.5" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/custom_progressbar.xml" value="0.33" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/file_progress.xml" value="0.3582427536231884" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/find_layout.xml" value="0.3278985507246377" />
@@ -48,6 +54,7 @@
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/tab_find.xml" value="0.21124620060790272" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/layout/tab_requests.xml" value="0.21124620060790272" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/menu/menu_change_profile_picture.xml" value="0.23981481481481481" />
+        <entry key="..\:/kotlin_projects/Avian/app/src/main/res/menu/menu_conversation_options.xml" value="0.3984615384615385" />
         <entry key="..\:/kotlin_projects/Avian/app/src/main/res/menu/menu_main.xml" value="0.33" />
       </map>
     </option>
