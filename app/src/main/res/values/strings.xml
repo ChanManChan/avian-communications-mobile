@@ -67,5 +67,5 @@
     <string name="file_downloaded_successfully">File downloaded successfully</string>
     <string name="view">View</string>
     <string name="failed_to_download">Failed to download file: %1$s</string>
-    <string name="share_with">Share with</string>
+    <string name="share_via">Share Via</string>
 </resources>

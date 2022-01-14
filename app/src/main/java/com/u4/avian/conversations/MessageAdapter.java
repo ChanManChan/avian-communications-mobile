@@ -26,6 +26,7 @@ import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.u4.avian.R;
 import com.u4.avian.common.Constants;
+import com.u4.avian.selectuser.SelectUserActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -221,7 +222,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                     actionMode.finish();
                     break;
                 case R.id.menuForward:
-                    Toast.makeText(context, "Forward Option Clicked", Toast.LENGTH_SHORT).show();
+                    if (context instanceof ConversationActivity) {
+                        ((ConversationActivity) context).forwardMessage(selectedMessageId, selectedMessage, selectedMessageType);
+                    }
                     actionMode.finish();
                     break;
                 case R.id.menuDownload:
@@ -237,7 +240,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         }
 
         @Override
-        public void onDestroyActionMode(ActionMode actionMode) {
+        public void onDestroyActionMode(ActionMode localActionMode) {
             actionMode = null;
             int color = context.getResources().getColor(R.color.grey);
             selectedView.setBackgroundColor(color);

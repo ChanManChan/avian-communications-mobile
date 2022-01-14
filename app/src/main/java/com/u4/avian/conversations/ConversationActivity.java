@@ -7,8 +7,14 @@ import static com.u4.avian.common.Constants.MESSAGE_TYPE_IMAGE;
 import static com.u4.avian.common.Constants.MESSAGE_TYPE_TEXT;
 import static com.u4.avian.common.Constants.MESSAGE_TYPE_VIDEO;
 import static com.u4.avian.common.Constants.MESSAGE_VIDEOS_FOLDER;
+import static com.u4.avian.common.Constants.PROFILE_PICTURE;
+import static com.u4.avian.common.Constants.USER_KEY;
+import static com.u4.avian.common.Constants.USER_NAME;
+import static com.u4.avian.common.NodeNames.MESSAGE;
 import static com.u4.avian.common.NodeNames.MESSAGES;
+import static com.u4.avian.common.NodeNames.MESSAGE_ID;
 import static com.u4.avian.common.NodeNames.MESSAGE_TYPE;
+import static com.u4.avian.common.NodeNames.PHOTO;
 import static com.u4.avian.common.Util.hasPermissions;
 
 import androidx.activity.result.ActivityResult;
@@ -69,6 +75,7 @@ import com.u4.avian.R;
 import com.u4.avian.common.Constants;
 import com.u4.avian.common.NodeNames;
 import com.u4.avian.common.Util;
+import com.u4.avian.selectuser.SelectUserActivity;
 
 import java.io.File;
 import java.io.IOException;
@@ -93,6 +100,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
     private ChildEventListener childEventListener;
     private BottomSheetDialog bottomSheetDialog;
     private LinearLayout llProgress;
+    private ActivityResultLauncher<Intent> intentActivityResultLauncher;
     Uri camUri;
 
     @Override
@@ -132,8 +140,8 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
             tvUserName.setText(getIntent().getStringExtra(Constants.USER_NAME));
         }
 
-        if (getIntent().hasExtra(Constants.PROFILE_PICTURE)) {
-            String photoName = getIntent().getStringExtra(Constants.PROFILE_PICTURE);
+        if (getIntent().hasExtra(PROFILE_PICTURE)) {
+            String photoName = getIntent().getStringExtra(PROFILE_PICTURE);
             if (!TextUtils.isEmpty(photoName)) {
                 StorageReference photoRef = FirebaseStorage.getInstance().getReference().child(Constants.PROFILE_IMAGES_FOLDER).child(photoName.substring(photoName.lastIndexOf("/")));
                 photoRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
@@ -144,6 +152,36 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                                 .placeholder(R.drawable.ic_default_profile)
                                 .error(R.drawable.ic_default_profile)
                                 .into(ivProfile);
+                    }
+                });
+            }
+        }
+
+        if (getIntent().hasExtra(MESSAGE) && getIntent().hasExtra(MESSAGE_ID) && getIntent().hasExtra(MESSAGE_TYPE)) {
+            String message = getIntent().getStringExtra(MESSAGE);
+            String messageId = getIntent().getStringExtra(MESSAGE_ID);
+            String messageType = getIntent().getStringExtra(MESSAGE_TYPE);
+
+            DatabaseReference forwardMessageRef = rootRef.child(MESSAGES).child(currentUserId).child(chatUserId).push();
+            String newMessageId = forwardMessageRef.getKey();
+
+            if (messageType.equals(MESSAGE_TYPE_TEXT)) {
+                sendMessage(message, messageType, newMessageId);
+            } else {
+                StorageReference storageReference = FirebaseStorage.getInstance().getReference();
+                String folder = messageType.equals(MESSAGE_TYPE_VIDEO) ? MESSAGE_VIDEOS_FOLDER : MESSAGE_IMAGES_FOLDER;
+                String fileExtension = messageType.equals(MESSAGE_TYPE_VIDEO) ? ".mp4" : ".jpg";
+                String oldFileName = messageId + fileExtension;
+                String newFileName = newMessageId + fileExtension;
+                String localFilePath = getExternalFilesDir(messageType.equals(MESSAGE_TYPE_VIDEO) ? "videos" : "images").getAbsolutePath() + "/" + oldFileName;
+                File localFile = new File(localFilePath);
+                StorageReference newFileRef = storageReference.child(folder).child(newFileName);
+
+                storageReference.child(folder).child(oldFileName).getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                        UploadTask uploadTask = newFileRef.putFile(Uri.fromFile(localFile));
+                        uploadProgress(uploadTask, newFileRef, newMessageId, messageType);
                     }
                 });
             }
@@ -174,6 +212,30 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         bottomSheetView.findViewById(R.id.llVideo).setOnClickListener(this);
         bottomSheetView.findViewById(R.id.ivClose).setOnClickListener(this);
         bottomSheetDialog.setContentView(bottomSheetView);
+
+        intentActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+            @Override
+            public void onActivityResult(ActivityResult result) {
+                if (result.getData() != null) {
+                    String userId = result.getData().getStringExtra(USER_KEY);
+                    String userName = result.getData().getStringExtra(USER_NAME);
+                    String photoName = result.getData().getStringExtra(PROFILE_PICTURE);
+                    String message = result.getData().getStringExtra(MESSAGE);
+                    String messageId = result.getData().getStringExtra(MESSAGE_ID);
+                    String messageType = result.getData().getStringExtra(MESSAGE_TYPE);
+
+                    Intent forwardIntent = new Intent(ConversationActivity.this, ConversationActivity.class);
+                    forwardIntent.putExtra(MESSAGE, message);
+                    forwardIntent.putExtra(MESSAGE_ID, messageId);
+                    forwardIntent.putExtra(MESSAGE_TYPE, messageType);
+                    forwardIntent.putExtra(USER_KEY, userId);
+                    forwardIntent.putExtra(USER_NAME, userName);
+                    forwardIntent.putExtra(PROFILE_PICTURE, photoName);
+                    startActivity(forwardIntent);
+                    finish();
+                }
+            }
+        });
     }
 
     private void loadMessages() {
@@ -488,8 +550,8 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
             String folderName = messageType.equals(MESSAGE_TYPE_VIDEO) ? MESSAGE_VIDEOS_FOLDER : MESSAGE_IMAGES_FOLDER;
             String fileName = messageId + (messageType.equals(MESSAGE_TYPE_VIDEO) ? ".mp4" : ".jpg");
             StorageReference fileRef = FirebaseStorage.getInstance().getReference().child(folderName).child(fileName);
-            String localFilePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + "/" + fileName.substring(1);
-//            String localFilePath = getExternalFilesDir(null).getAbsolutePath() + "/" + fileName;
+//            String localFilePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + "/" + fileName.substring(1);
+            String localFilePath = getExternalFilesDir(messageType.equals(MESSAGE_TYPE_VIDEO) ? "videos" : "images").getAbsolutePath() + "/" + fileName;
             File localFile = new File(localFilePath);
             try {
                 if (localFile.exists() || localFile.createNewFile()) {
@@ -544,10 +606,14 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                             llProgress.removeView(view);
                             if (task.isSuccessful()) {
                                 if (isShare) {
-                                    Intent intentShare = new Intent(Intent.ACTION_SEND);
-                                    intentShare.putExtra(Intent.EXTRA_STREAM, Uri.parse(localFilePath));
-                                    intentShare.setType(messageType.equals(MESSAGE_TYPE_VIDEO) ? "video/mp4" : "image/jpg");
-                                    startActivity(intentShare);
+//                                    ArrayList<Uri> imageUris = new ArrayList<>();
+//                                    imageUris.add(Uri.parse(localFilePath));
+//                                    Intent intentShareImage = new Intent(Intent.ACTION_SEND_MULTIPLE);
+//                                    intentShareImage.putParcelableArrayListExtra(Intent.EXTRA_STREAM, imageUris);
+                                    Intent intentShareFile = new Intent(Intent.ACTION_SEND);
+                                    intentShareFile.putExtra(Intent.EXTRA_STREAM, Uri.parse(localFilePath));
+                                    intentShareFile.setType(messageType.equals(MESSAGE_TYPE_VIDEO) ? "video/*" : "image/*");
+                                    startActivity(Intent.createChooser(intentShareFile, getString(R.string.share_via)));
                                 } else {
                                     Snackbar snackbar = Snackbar.make(llProgress, getString(R.string.file_downloaded_successfully), Snackbar.LENGTH_LONG);
                                     snackbar.setAction(R.string.view, new View.OnClickListener() {
@@ -586,5 +652,13 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         } else {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2);
         }
+    }
+
+    public void forwardMessage(String selectedMessageId, String selectedMessage, String selectedMessageType) {
+        Intent intent = new Intent(this, SelectUserActivity.class);
+        intent.putExtra(MESSAGE, selectedMessage);
+        intent.putExtra(MESSAGE_ID, selectedMessageId);
+        intent.putExtra(MESSAGE_TYPE, selectedMessageType);
+        intentActivityResultLauncher.launch(intent);
     }
 }
