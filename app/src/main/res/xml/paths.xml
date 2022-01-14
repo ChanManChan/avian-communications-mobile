@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths>
+    <external-path
+        name="external_files"
+        path="." />
     <files-path
         name="shared_images"
         path="images/" />
@@ -9,7 +12,4 @@
     <cache-path
         name="shared_images_cache"
         path="images/" />
-    <external-path
-        name="image_external"
-        path="./Download/" />
 </paths>

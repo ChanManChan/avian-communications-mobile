@@ -26,6 +26,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -550,8 +551,8 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
             String folderName = messageType.equals(MESSAGE_TYPE_VIDEO) ? MESSAGE_VIDEOS_FOLDER : MESSAGE_IMAGES_FOLDER;
             String fileName = messageId + (messageType.equals(MESSAGE_TYPE_VIDEO) ? ".mp4" : ".jpg");
             StorageReference fileRef = FirebaseStorage.getInstance().getReference().child(folderName).child(fileName);
-//            String localFilePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + "/" + fileName.substring(1);
-            String localFilePath = getExternalFilesDir(messageType.equals(MESSAGE_TYPE_VIDEO) ? "videos" : "images").getAbsolutePath() + "/" + fileName;
+            String localFilePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + "/" + fileName.substring(1);
+//            String localFilePath = getExternalFilesDir(messageType.equals(MESSAGE_TYPE_VIDEO) ? "videos" : "images").getAbsolutePath() + "/" + fileName;
             File localFile = new File(localFilePath);
             try {
                 if (localFile.exists() || localFile.createNewFile()) {
@@ -606,12 +607,9 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                             llProgress.removeView(view);
                             if (task.isSuccessful()) {
                                 if (isShare) {
-//                                    ArrayList<Uri> imageUris = new ArrayList<>();
-//                                    imageUris.add(Uri.parse(localFilePath));
-//                                    Intent intentShareImage = new Intent(Intent.ACTION_SEND_MULTIPLE);
-//                                    intentShareImage.putParcelableArrayListExtra(Intent.EXTRA_STREAM, imageUris);
                                     Intent intentShareFile = new Intent(Intent.ACTION_SEND);
-                                    intentShareFile.putExtra(Intent.EXTRA_STREAM, Uri.parse(localFilePath));
+                                    intentShareFile.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(ConversationActivity.this, ConversationActivity.this.getApplicationContext().getPackageName() + ".fileprovider", localFile));
+                                    intentShareFile.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                                     intentShareFile.setType(messageType.equals(MESSAGE_TYPE_VIDEO) ? "video/*" : "image/*");
                                     startActivity(Intent.createChooser(intentShareFile, getString(R.string.share_via)));
                                 } else {

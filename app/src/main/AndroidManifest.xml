@@ -53,7 +53,6 @@
             android:name=".login.LoginActivity"
             android:exported="true" />
         <activity android:name=".MainActivity" />
-
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.u4.avian.fileprovider"
