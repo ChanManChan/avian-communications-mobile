@@ -1,6 +1,7 @@
 package com.u4.avian.login;
 
 import static com.u4.avian.common.Util.connectionAvailable;
+import static com.u4.avian.common.Util.updateDeviceToken;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,11 +13,14 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.installations.FirebaseInstallations;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.u4.avian.MainActivity;
 import com.u4.avian.R;
 import com.u4.avian.common.MessageActivity;
@@ -96,6 +100,12 @@ public class LoginActivity extends AppCompatActivity {
         FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
 
         if (firebaseUser != null) {
+            FirebaseMessaging.getInstance().getToken().addOnSuccessListener(new OnSuccessListener<String>() {
+                @Override
+                public void onSuccess(String s) {
+                    updateDeviceToken(LoginActivity.this, s);
+                }
+            });
             startActivity(new Intent(LoginActivity.this, MainActivity.class));
             finish();
         }

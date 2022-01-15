@@ -5,6 +5,7 @@ import static com.u4.avian.common.NodeNames.EMAIL;
 import static com.u4.avian.common.NodeNames.NAME;
 import static com.u4.avian.common.NodeNames.ONLINE;
 import static com.u4.avian.common.NodeNames.PHOTO;
+import static com.u4.avian.common.NodeNames.TOKENS;
 import static com.u4.avian.common.NodeNames.USERS;
 
 import androidx.activity.result.ActivityResultCallback;
@@ -52,6 +53,7 @@ public class ProfileActivity extends AppCompatActivity {
     private FirebaseUser firebaseUser;
     private DatabaseReference databaseReference;
     private StorageReference storageReference;
+    private FirebaseAuth firebaseAuth;
     private Uri localFileUri, serverFileUri;
     private boolean removePicture = false;
     private View progressBar;
@@ -66,8 +68,9 @@ public class ProfileActivity extends AppCompatActivity {
         ivProfile = findViewById(R.id.ivProfile);
         progressBar = findViewById(R.id.progressBar);
         storageReference = FirebaseStorage.getInstance().getReference();
-        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser();
+        databaseReference = FirebaseDatabase.getInstance().getReference();
 
         if (firebaseUser != null) {
             etName.setText(firebaseUser.getDisplayName());
@@ -116,10 +119,19 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     public void btnLogoutClick(View view) {
-        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-        firebaseAuth.signOut();
-        startActivity(new Intent(ProfileActivity.this, LoginActivity.class));
-        finish();
+        DatabaseReference tokenDatabaseReference = databaseReference.child(TOKENS).child(firebaseUser.getUid());
+        tokenDatabaseReference.setValue(null).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    firebaseAuth.signOut();
+                    startActivity(new Intent(ProfileActivity.this, LoginActivity.class));
+                    finish();
+                } else {
+                    Toast.makeText(ProfileActivity.this, getString(R.string.generic_error, task.getException()), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     public void changeImage(View view) {
@@ -213,7 +225,7 @@ public class ProfileActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
                             String userID = firebaseUser.getUid();
-                            databaseReference = FirebaseDatabase.getInstance().getReference().child(USERS);
+                            DatabaseReference databaseReferenceUsers = databaseReference.child(USERS);
                             HashMap<String, String> hashMap = new HashMap<>();
                             hashMap.put(NAME, nameText.toString().trim());
                             hashMap.put(EMAIL, emailText.toString().trim());
@@ -227,7 +239,7 @@ public class ProfileActivity extends AppCompatActivity {
                                 hashMap.put(PHOTO, serverFileUri.getPath());
                             }
 
-                            databaseReference.child(userID).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            databaseReferenceUsers.child(userID).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     progressBar.setVisibility(View.GONE);

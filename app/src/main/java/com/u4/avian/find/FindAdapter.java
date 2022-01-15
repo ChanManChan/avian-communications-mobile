@@ -1,10 +1,12 @@
 package com.u4.avian.find;
 
+import static com.u4.avian.common.Constants.MESSAGE_TYPE_NOTIFICATION;
 import static com.u4.avian.common.Constants.PROFILE_IMAGES_FOLDER;
 import static com.u4.avian.common.Constants.REQUEST_STATUS_RECEIVED;
 import static com.u4.avian.common.Constants.REQUEST_STATUS_SENT;
 import static com.u4.avian.common.NodeNames.REQUESTS;
 import static com.u4.avian.common.NodeNames.REQUEST_TYPE;
+import static com.u4.avian.common.Util.sendNotification;
 
 import android.content.Context;
 import android.net.Uri;
@@ -99,6 +101,9 @@ public class FindAdapter extends RecyclerView.Adapter<FindAdapter.FindViewHolder
                                                 Toast.makeText(context, R.string.request_sent_successfully, Toast.LENGTH_SHORT).show();
                                                 holder.btnSendRequest.setVisibility(View.GONE);
                                                 holder.btnCancelRequest.setVisibility(View.VISIBLE);
+                                                String title = "New Request";
+                                                String message = "Request from " + currentUser.getDisplayName();
+                                                sendNotification(context, title, message, MESSAGE_TYPE_NOTIFICATION, userId);
                                             } else {
                                                 Toast.makeText(context, context.getString(R.string.failed_to_send_request, task.getException()), Toast.LENGTH_SHORT).show();
                                                 holder.btnSendRequest.setVisibility(View.VISIBLE);

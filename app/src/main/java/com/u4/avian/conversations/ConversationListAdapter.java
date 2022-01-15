@@ -46,6 +46,7 @@ public class ConversationListAdapter extends RecyclerView.Adapter<ConversationLi
         ConversationListModel conversationListModel = conversationListModelList.get(position);
         holder.tvFullName.setText(conversationListModel.getUserName());
         String photoName = conversationListModel.getPhotoName();
+        int unreadCount = Integer.parseInt(conversationListModel.getUnreadCount());
         StorageReference fileRef = FirebaseStorage.getInstance().getReference().child(PROFILE_IMAGES_FOLDER + (!photoName.equals("") ? photoName.substring(photoName.lastIndexOf("/")) : ""));
         fileRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
@@ -57,6 +58,18 @@ public class ConversationListAdapter extends RecyclerView.Adapter<ConversationLi
                         .into(holder.ivProfile);
             }
         });
+
+        String lastMessage = conversationListModel.getLastMessage();
+        String lastMessageTime = conversationListModel.getLastMessageTime();
+        holder.tvLastMessage.setText(lastMessage);
+        holder.tvLastMessageTime.setText(lastMessageTime);
+
+        if (unreadCount > 0) {
+            holder.tvUnreadCount.setVisibility(View.VISIBLE);
+            holder.tvUnreadCount.setText(String.valueOf(unreadCount));
+        } else {
+            holder.tvUnreadCount.setVisibility(View.GONE);
+        }
 
         holder.llConversationList.setOnClickListener(new View.OnClickListener() {
             @Override

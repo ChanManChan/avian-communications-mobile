@@ -35,6 +35,7 @@ public class ConversationFragment extends Fragment {
     private TextView tvEmptyConversationList;
     private ConversationListAdapter conversationListAdapter;
     private List<ConversationListModel> conversationListModelList;
+    private List<String> userIds;
     private DatabaseReference databaseReferenceUsers;
     private ChildEventListener childEventListener;
     private Query query;
@@ -57,6 +58,7 @@ public class ConversationFragment extends Fragment {
         tvEmptyConversationList = view.findViewById(R.id.tvEmptyConversationList);
         progressBar = view.findViewById(R.id.progressBar);
         conversationListModelList = new ArrayList<>();
+        userIds = new ArrayList<>();
         conversationListAdapter = new ConversationListAdapter(getActivity(), conversationListModelList);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
@@ -79,7 +81,7 @@ public class ConversationFragment extends Fragment {
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
+                updateList(snapshot, false, snapshot.getKey());
             }
 
             @Override
@@ -107,16 +109,32 @@ public class ConversationFragment extends Fragment {
     private void updateList(DataSnapshot dataSnapshot, boolean isNew, String userId) {
         progressBar.setVisibility(View.GONE);
         tvEmptyConversationList.setVisibility(View.GONE);
-        String lastMessage = "", lastMessageTime = "", unreadCount = "";
+        Object unreadObject = dataSnapshot.child(NodeNames.UNREAD_COUNT).getValue();
+        String unreadCount = unreadObject != null ? unreadObject.toString() : "0";
         databaseReferenceUsers.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                String fullName = "", photoName = "";
-                fullName = snapshot.child(NodeNames.NAME).getValue() != null ? snapshot.child(NodeNames.NAME).getValue().toString() : "";
-                photoName = snapshot.child(NodeNames.PHOTO).getValue() != null ? snapshot.child(NodeNames.PHOTO).getValue().toString() : "";
-                ConversationListModel conversationListModel = new ConversationListModel(userId, fullName, photoName, unreadCount, lastMessage, lastMessageTime);
-                conversationListModelList.add(conversationListModel);
-                conversationListAdapter.notifyDataSetChanged();
+                Object nameObject = snapshot.child(NodeNames.NAME).getValue();
+                Object photoObject = snapshot.child(NodeNames.PHOTO).getValue();
+                Object lastMessageObject = snapshot.child(NodeNames.LAST_MESSAGE).getValue();
+                Object lastMessageTimeObject = snapshot.child(NodeNames.LAST_MESSAGE_TIME).getValue();
+                if (nameObject != null && photoObject != null && lastMessageObject != null && lastMessageTimeObject != null) {
+                    String fullName = nameObject.toString();
+                    String photoName = photoObject.toString();
+                    String lastMessage = lastMessageObject.toString();
+                    String lastMessageTime = lastMessageTimeObject.toString();
+                    ConversationListModel conversationListModel = new ConversationListModel(userId, fullName, photoName, unreadCount, lastMessage, lastMessageTime);
+
+                    if (isNew) {
+                        conversationListModelList.add(conversationListModel);
+                        userIds.add(userId);
+                    } else {
+                        int indexOfClickedUser = userIds.indexOf(userId);
+                        conversationListModelList.set(indexOfClickedUser, conversationListModel);
+                    }
+
+                    conversationListAdapter.notifyDataSetChanged();
+                }
             }
 
             @Override

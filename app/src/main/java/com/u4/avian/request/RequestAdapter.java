@@ -1,8 +1,10 @@
 package com.u4.avian.request;
 
+import static com.u4.avian.common.Constants.MESSAGE_TYPE_NOTIFICATION;
 import static com.u4.avian.common.Constants.PROFILE_IMAGES_FOLDER;
 import static com.u4.avian.common.NodeNames.REQUESTS;
 import static com.u4.avian.common.NodeNames.REQUEST_TYPE;
+import static com.u4.avian.common.Util.sendNotification;
 
 import android.content.Context;
 import android.net.Uri;
@@ -103,6 +105,9 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
                     public void onComplete(@Nullable DatabaseError error, boolean committed, @Nullable DataSnapshot currentData) {
                         Toast.makeText(context, context.getString(R.string.accepted_request), Toast.LENGTH_SHORT).show();
                         enableButtons(holder);
+                        String title = "Request accepted";
+                        String message = "Request accepted by " + currentUser.getDisplayName();
+                        sendNotification(context, title, message, MESSAGE_TYPE_NOTIFICATION, userId);
                     }
                 }, false);
             }
@@ -126,6 +131,9 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
                                     if (task.isSuccessful()) {
                                         Toast.makeText(context, context.getString(R.string.request_rejected), Toast.LENGTH_SHORT).show();
                                         enableButtons(holder);
+                                        String title = "Request rejected";
+                                        String message = "Request rejected by " + currentUser.getDisplayName();
+                                        sendNotification(context, title, message, MESSAGE_TYPE_NOTIFICATION, userId);
                                     } else {
                                         Toast.makeText(context, context.getString(R.string.failed_to_reject_request, task.getException()), Toast.LENGTH_SHORT).show();
                                         enableButtons(holder);

@@ -16,6 +16,8 @@ import static com.u4.avian.common.NodeNames.MESSAGE_ID;
 import static com.u4.avian.common.NodeNames.MESSAGE_TYPE;
 import static com.u4.avian.common.NodeNames.PHOTO;
 import static com.u4.avian.common.Util.hasPermissions;
+import static com.u4.avian.common.Util.sendNotification;
+import static com.u4.avian.common.Util.updateChatDetails;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
@@ -196,6 +198,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         rvMessages.setAdapter(messageAdapter);
 
         loadMessages();
+        rootRef.child(NodeNames.CONVERSATIONS).child(currentUserId).child(chatUserId).child(NodeNames.UNREAD_COUNT).setValue(0);
         rvMessages.scrollToPosition(messageModelList.size() - 1);
 
         srlMessages.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -304,6 +307,10 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                         Toast.makeText(ConversationActivity.this, getString(R.string.failed_to_send_message, error.getMessage()), Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(ConversationActivity.this, getString(R.string.message_sent_successfully), Toast.LENGTH_SHORT).show();
+                        String title = messageType.equals(MESSAGE_TYPE_TEXT) ? "New Message" : messageType.equals(MESSAGE_TYPE_IMAGE) ? "New Image" : "New Video";
+                        String lastMessage = !title.equals("New Message") ? title : message;
+                        sendNotification(ConversationActivity.this, title, message, messageType, chatUserId);
+                        updateChatDetails(ConversationActivity.this, currentUserId, chatUserId, lastMessage);
                     }
                 }
             });
@@ -658,5 +665,11 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         intent.putExtra(MESSAGE_ID, selectedMessageId);
         intent.putExtra(MESSAGE_TYPE, selectedMessageType);
         intentActivityResultLauncher.launch(intent);
+    }
+
+    @Override
+    public void onBackPressed() {
+        rootRef.child(NodeNames.CONVERSATIONS).child(currentUserId).child(chatUserId).child(NodeNames.UNREAD_COUNT).setValue(0);
+        super.onBackPressed();
     }
 }
