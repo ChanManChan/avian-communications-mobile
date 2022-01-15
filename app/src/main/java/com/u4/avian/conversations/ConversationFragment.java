@@ -116,25 +116,23 @@ public class ConversationFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Object nameObject = snapshot.child(NodeNames.NAME).getValue();
                 Object photoObject = snapshot.child(NodeNames.PHOTO).getValue();
-                Object lastMessageObject = snapshot.child(NodeNames.LAST_MESSAGE).getValue();
-                Object lastMessageTimeObject = snapshot.child(NodeNames.LAST_MESSAGE_TIME).getValue();
-                if (nameObject != null && photoObject != null && lastMessageObject != null && lastMessageTimeObject != null) {
-                    String fullName = nameObject.toString();
-                    String photoName = photoObject.toString();
-                    String lastMessage = lastMessageObject.toString();
-                    String lastMessageTime = lastMessageTimeObject.toString();
-                    ConversationListModel conversationListModel = new ConversationListModel(userId, fullName, photoName, unreadCount, lastMessage, lastMessageTime);
+                Object lastMessageObject = dataSnapshot.child(NodeNames.LAST_MESSAGE).getValue();
+                Object lastMessageTimeObject = dataSnapshot.child(NodeNames.LAST_MESSAGE_TIME).getValue();
+                String fullName = nameObject != null ? nameObject.toString() : "";
+                String photoName = photoObject != null ? photoObject.toString() : "";
+                String lastMessage = lastMessageObject != null ? lastMessageObject.toString() : "";
+                String lastMessageTime = lastMessageTimeObject != null ? lastMessageTimeObject.toString() : "";
+                ConversationListModel conversationListModel = new ConversationListModel(userId, fullName, photoName, unreadCount, lastMessage, lastMessageTime);
 
-                    if (isNew) {
-                        conversationListModelList.add(conversationListModel);
-                        userIds.add(userId);
-                    } else {
-                        int indexOfClickedUser = userIds.indexOf(userId);
-                        conversationListModelList.set(indexOfClickedUser, conversationListModel);
-                    }
-
-                    conversationListAdapter.notifyDataSetChanged();
+                if (isNew) {
+                    conversationListModelList.add(conversationListModel);
+                    userIds.add(userId);
+                } else {
+                    int indexOfClickedUser = userIds.indexOf(userId);
+                    conversationListModelList.set(indexOfClickedUser, conversationListModel);
                 }
+
+                conversationListAdapter.notifyDataSetChanged();
             }
 
             @Override

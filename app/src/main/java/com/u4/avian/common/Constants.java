@@ -26,6 +26,6 @@ public class Constants {
     public static final String NOTIFICATION_CHANNEL_ID = "avian_app_01";
     public static final String NOTIFICATION_CHANNEL_NAME = "avian_app_notifications";
     public static final String NOTIFICATION_CHANNEL_DESCRIPTION = "Avian app notifications";
-    public static final String FIREBASE_SERVER_KEY = "AAAAERcnqgk:APA91bEE_klLdSpNyKmlJpzKz9NkqlU9Km-THqnv2JGrmoVd1HOQgGsqMQVQBu-_1valm3NIIAtubwFWyB6v9Dx0rR4iVP4No9Dtbkts7Dh93M_8E3r-2ecwPJwtthjet-mB7Khay3es";
-    public static final String FIREBASE_SENDER_ID = "73402919433";
+    public static final String FIREBASE_SERVER_KEY = "";
+    public static final String FIREBASE_SENDER_ID = "";
 }
