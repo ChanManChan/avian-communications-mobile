@@ -14,7 +14,6 @@ import static com.u4.avian.common.NodeNames.MESSAGE;
 import static com.u4.avian.common.NodeNames.MESSAGES;
 import static com.u4.avian.common.NodeNames.MESSAGE_ID;
 import static com.u4.avian.common.NodeNames.MESSAGE_TYPE;
-import static com.u4.avian.common.NodeNames.PHOTO;
 import static com.u4.avian.common.Util.hasPermissions;
 import static com.u4.avian.common.Util.sendNotification;
 import static com.u4.avian.common.Util.updateChatDetails;
