@@ -3,6 +3,7 @@ package com.u4.avian.common;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
+import android.text.format.DateUtils;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -169,5 +170,13 @@ public class Util {
                 Toast.makeText(context, context.getString(R.string.generic_error, error.getMessage()), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public static String getTimeAgo(String time) {
+        if (!time.equals("")) {
+            CharSequence relativeTimeSpanString = DateUtils.getRelativeTimeSpanString(Long.parseLong(time));
+            return relativeTimeSpanString.toString();
+        }
+        return null;
     }
 }

@@ -1,6 +1,7 @@
 package com.u4.avian.conversations;
 
 import static com.u4.avian.common.Constants.PROFILE_IMAGES_FOLDER;
+import static com.u4.avian.common.Util.getTimeAgo;
 
 import android.content.Context;
 import android.content.Intent;
@@ -62,7 +63,7 @@ public class ConversationListAdapter extends RecyclerView.Adapter<ConversationLi
         String lastMessage = conversationListModel.getLastMessage();
         String lastMessageTime = conversationListModel.getLastMessageTime();
         holder.tvLastMessage.setText(lastMessage);
-        holder.tvLastMessageTime.setText(lastMessageTime);
+        holder.tvLastMessageTime.setText(getTimeAgo(lastMessageTime));
 
         if (unreadCount > 0) {
             holder.tvUnreadCount.setVisibility(View.VISIBLE);

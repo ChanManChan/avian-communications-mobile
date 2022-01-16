@@ -41,7 +41,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,6 +61,9 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipDrawable;
+import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -68,11 +73,17 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.google.mlkit.nl.smartreply.SmartReply;
+import com.google.mlkit.nl.smartreply.SmartReplyGenerator;
+import com.google.mlkit.nl.smartreply.SmartReplySuggestion;
+import com.google.mlkit.nl.smartreply.SmartReplySuggestionResult;
+import com.google.mlkit.nl.smartreply.TextMessage;
 import com.u4.avian.R;
 import com.u4.avian.common.Constants;
 import com.u4.avian.common.NodeNames;
@@ -94,6 +105,9 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
     private RecyclerView rvMessages;
     private SwipeRefreshLayout srlMessages;
     private MessageAdapter messageAdapter;
+    private TextView tvUserStatus;
+    private ChipGroup cgSmartReply;
+    private List<TextMessage> mlConversation;
     private List<MessageModel> messageModelList;
     private int currentPage = 1;
     private static final int RECORDS_PER_PAGE = 30;
@@ -121,12 +135,15 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
             actionBar.setDisplayOptions(actionBar.getDisplayOptions() | ActionBar.DISPLAY_SHOW_CUSTOM);
         }
 
+        cgSmartReply = findViewById(R.id.cgSmartReply);
+        mlConversation = new ArrayList<>();
         ImageView ivSend = findViewById(R.id.ivSend);
         ImageView ivAttachment = findViewById(R.id.ivAttachment);
         ImageView ivProfile = findViewById(R.id.ivProfile);
         TextView tvUserName = findViewById(R.id.tvUserName);
         etMessage = findViewById(R.id.etMessage);
         llProgress = findViewById(R.id.llProgress);
+        tvUserStatus = findViewById(R.id.tvUserStatus);
 
         ivSend.setOnClickListener(this);
         ivAttachment.setOnClickListener(this);
@@ -239,10 +256,76 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                 }
             }
         });
+
+        DatabaseReference databaseReferenceStatus = rootRef.child(NodeNames.USERS).child(chatUserId);
+        databaseReferenceStatus.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Object onlineObject = snapshot.child(NodeNames.ONLINE).getValue();
+                if (onlineObject != null) {
+                    String status = onlineObject.toString();
+                    if (status.equals("true")) {
+                        tvUserStatus.setText(Constants.STATUS_ONLINE);
+                    } else {
+                        tvUserStatus.setText(Constants.STATUS_OFFLINE);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        etMessage.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                DatabaseReference databaseReferenceTyping = rootRef.child(NodeNames.CONVERSATIONS).child(chatUserId).child(currentUserId);
+                if (editable.toString().matches("")) {
+                    databaseReferenceTyping.child(NodeNames.TYPING).setValue(Constants.TYPING_STOPPED);
+                } else {
+                    databaseReferenceTyping.child(NodeNames.TYPING).setValue(Constants.TYPING_STARTED);
+                }
+            }
+        });
+
+        DatabaseReference chatUserRef = rootRef.child(NodeNames.CONVERSATIONS).child(currentUserId).child(chatUserId);
+        chatUserRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Object typingObject = snapshot.child(NodeNames.TYPING).getValue();
+                if (typingObject != null) {
+                    String typingStatus = typingObject.toString();
+                    if (typingStatus.equals(Constants.TYPING_STARTED)) {
+                        tvUserStatus.setText(Constants.STATUS_TYPING);
+                    } else {
+                        tvUserStatus.setText(Constants.STATUS_ONLINE);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     private void loadMessages() {
         messageModelList.clear();
+        mlConversation.clear();
+        cgSmartReply.removeAllViews();
         DatabaseReference databaseReferenceMessages = rootRef.child(MESSAGES).child(currentUserId).child(chatUserId);
         Query messageQuery = databaseReferenceMessages.limitToLast(currentPage * RECORDS_PER_PAGE);
 
@@ -257,6 +340,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                 messageAdapter.notifyDataSetChanged();
                 rvMessages.scrollToPosition(messageModelList.size() - 1);
                 srlMessages.setRefreshing(false);
+                showSmartReplies(messageModel);
             }
 
             @Override
@@ -297,6 +381,10 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
             HashMap<String, Object> messageUserMap = new HashMap<>();
             messageUserMap.put(currentUserRef + "/" + pushId, messageMap);
             messageUserMap.put(chatUserRef + "/" + pushId, messageMap);
+
+            if (messageType.equals(MESSAGE_TYPE_TEXT)) {
+                mlConversation.add(TextMessage.createForLocalUser(message, System.currentTimeMillis()));
+            }
 
             etMessage.setText("");
             rootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener() {
@@ -670,5 +758,65 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
     public void onBackPressed() {
         rootRef.child(NodeNames.CONVERSATIONS).child(currentUserId).child(chatUserId).child(NodeNames.UNREAD_COUNT).setValue(0);
         super.onBackPressed();
+    }
+
+    private void showSmartReplies(MessageModel messageModel) {
+        mlConversation.clear();
+        cgSmartReply.removeAllViews();
+        DatabaseReference databaseReferenceChatUser = rootRef.child(MESSAGES).child(currentUserId).child(chatUserId);
+        Query lastMessage = databaseReferenceChatUser.orderByKey().limitToLast(1);
+        lastMessage.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot data : snapshot.getChildren()) {
+                    MessageModel message = data.getValue(MessageModel.class);
+                    if (message != null && message.getMessageFrom().equals(chatUserId) && messageModel.getMessageId().equals(message.getMessageId()) && message.getMessageType().equals(MESSAGE_TYPE_TEXT)) {
+                        mlConversation.add(TextMessage.createForRemoteUser(message.getMessage(), System.currentTimeMillis(), chatUserId));
+                        if (!mlConversation.isEmpty()) {
+                            SmartReplyGenerator smartReplyGenerator = SmartReply.getClient();
+                            smartReplyGenerator.suggestReplies(mlConversation).addOnSuccessListener(new OnSuccessListener<SmartReplySuggestionResult>() {
+                                @Override
+                                public void onSuccess(@NonNull SmartReplySuggestionResult smartReplySuggestionResult) {
+                                    if (smartReplySuggestionResult.getStatus() == SmartReplySuggestionResult.STATUS_NOT_SUPPORTED_LANGUAGE) {
+                                        Toast.makeText(ConversationActivity.this, getString(R.string.language_not_supported), Toast.LENGTH_SHORT).show();
+                                    } else if (smartReplySuggestionResult.getStatus() == SmartReplySuggestionResult.STATUS_SUCCESS) {
+                                        for (SmartReplySuggestion suggestion : smartReplySuggestionResult.getSuggestions()) {
+                                            String replyText = suggestion.getText();
+                                            Chip chip = new Chip(ConversationActivity.this);
+                                            ChipDrawable drawable = ChipDrawable.createFromAttributes(ConversationActivity.this, null, 0, R.style.Widget_MaterialComponents_Chip_Action);
+                                            chip.setChipDrawable(drawable);
+                                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                                            params.setMargins(8, 8, 8, 8);
+                                            chip.setLayoutParams(params);
+                                            chip.setText(replyText);
+                                            chip.setTag(replyText);
+                                            chip.setOnClickListener(new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View view) {
+                                                    DatabaseReference messageRef = rootRef.child(MESSAGES).child(currentUserId).child(chatUserId).push();
+                                                    String pushId = messageRef.getKey();
+                                                    sendMessage(view.getTag().toString(), MESSAGE_TYPE_TEXT, pushId);
+                                                }
+                                            });
+                                            cgSmartReply.addView(chip);
+                                        }
+                                    }
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Toast.makeText(ConversationActivity.this, getString(R.string.generic_error, e.getMessage()), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 }

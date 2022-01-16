@@ -22,4 +22,5 @@ public class NodeNames {
     public static final String UNREAD_COUNT = "unreadCount";
     public static final String LAST_MESSAGE = "lastMessage";
     public static final String LAST_MESSAGE_TIME = "lastMessageTime";
+    public static final String TYPING = "Typing";
 }

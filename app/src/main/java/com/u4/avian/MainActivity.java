@@ -15,6 +15,10 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.u4.avian.common.NodeNames;
 import com.u4.avian.conversations.ConversationFragment;
 import com.u4.avian.find.FindFragment;
 import com.u4.avian.request.RequestsFragment;
@@ -34,6 +38,11 @@ public class MainActivity extends AppCompatActivity {
         tabLayout = findViewById(R.id.tabMain);
         viewPager2 = findViewById(R.id.vpMain);
 
+        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+        String currentUserId = firebaseAuth.getCurrentUser().getUid();
+        DatabaseReference databaseReferenceUsers = FirebaseDatabase.getInstance().getReference().child(NodeNames.USERS).child(currentUserId);
+        databaseReferenceUsers.child(NodeNames.ONLINE).setValue(true);
+        databaseReferenceUsers.child(NodeNames.ONLINE).onDisconnect().setValue(false);
         setViewPager2();
     }
 

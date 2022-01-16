@@ -71,4 +71,5 @@
     <string name="failed_to_fetch_device_token">Failed to save device token: %1$s</string>
     <string name="notification_sent">Notification sent</string>
     <string name="failed_to_send_notification">Failed to send notification: %1$s</string>
+    <string name="language_not_supported">Language not supported for smart replies</string>
 </resources>
