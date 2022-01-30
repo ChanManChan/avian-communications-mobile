@@ -162,7 +162,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         if (getIntent().hasExtra(PROFILE_PICTURE)) {
             String photoName = getIntent().getStringExtra(PROFILE_PICTURE);
             if (!TextUtils.isEmpty(photoName)) {
-                StorageReference photoRef = FirebaseStorage.getInstance().getReference().child(Constants.PROFILE_IMAGES_FOLDER).child(photoName.substring(photoName.lastIndexOf("/")));
+                StorageReference photoRef = FirebaseStorage.getInstance().getReference().child(Constants.PROFILE_IMAGES_FOLDER).child(!photoName.equals("") ? photoName.substring(photoName.lastIndexOf("/")) : "");
                 photoRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
                     public void onSuccess(Uri uri) {

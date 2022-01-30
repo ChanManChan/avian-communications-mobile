@@ -5,7 +5,7 @@
     <color name="red_700">#8e0000</color>
     <color name="green_200">#00695c</color>
     <color name="green_700">#003d33</color>
-    <color name="black">#FF000000</color>
+    <color name="black">#FF424242</color>
     <color name="white">#FFFFFFFF</color>
     <color name="grey">#f2f2f2</color>
 </resources>

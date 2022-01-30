@@ -57,6 +57,7 @@ public class ConversationFragment extends Fragment {
         RecyclerView rvConversationList = view.findViewById(R.id.rvConversations);
         tvEmptyConversationList = view.findViewById(R.id.tvEmptyConversationList);
         progressBar = view.findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.VISIBLE);
         conversationListModelList = new ArrayList<>();
         userIds = new ArrayList<>();
         conversationListAdapter = new ConversationListAdapter(getActivity(), conversationListModelList);
@@ -70,40 +71,40 @@ public class ConversationFragment extends Fragment {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
         databaseReferenceUsers = databaseReference.child(NodeNames.USERS);
-        DatabaseReference databaseReferenceConversations = databaseReference.child(NodeNames.CONVERSATIONS).child(currentUser.getUid());
-        query = databaseReferenceConversations.orderByChild(NodeNames.TIMESTAMP);
+        if (currentUser != null) {
+            DatabaseReference databaseReferenceConversations = databaseReference.child(NodeNames.CONVERSATIONS).child(currentUser.getUid());
+            query = databaseReferenceConversations.orderByChild(NodeNames.TIMESTAMP);
 
-        childEventListener = new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                updateList(snapshot, true, snapshot.getKey());
-            }
+            childEventListener = new ChildEventListener() {
+                @Override
+                public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                    updateList(snapshot, true, snapshot.getKey());
+                }
 
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                updateList(snapshot, false, snapshot.getKey());
-            }
+                @Override
+                public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                    updateList(snapshot, false, snapshot.getKey());
+                }
 
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+                @Override
+                public void onChildRemoved(@NonNull DataSnapshot snapshot) {
 
-            }
+                }
 
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                @Override
+                public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
 
-            }
+                }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                }
+            };
 
-            }
-        };
-
-        query.addChildEventListener(childEventListener);
-
-        progressBar.setVisibility(View.VISIBLE);
-        tvEmptyConversationList.setVisibility(View.VISIBLE);
+            query.addChildEventListener(childEventListener);
+            progressBar.setVisibility(View.GONE);
+            tvEmptyConversationList.setVisibility(View.VISIBLE);
+        }
     }
 
     private void updateList(DataSnapshot dataSnapshot, boolean isNew, String userId) {

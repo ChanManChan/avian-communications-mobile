@@ -46,7 +46,7 @@ public class SelectUserAdapter extends RecyclerView.Adapter<SelectUserAdapter.Se
         holder.tvFullName.setText(userModel.getUserName());
         String photoName = userModel.getPhotoName();
         if (!TextUtils.isEmpty(photoName)) {
-            StorageReference fileRef = FirebaseStorage.getInstance().getReference().child(PROFILE_IMAGES_FOLDER + photoName.substring(photoName.lastIndexOf("/")));
+            StorageReference fileRef = FirebaseStorage.getInstance().getReference().child(PROFILE_IMAGES_FOLDER + (!photoName.equals("") ? photoName.substring(photoName.lastIndexOf("/")) : ""));
             fileRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                 @Override
                 public void onSuccess(Uri uri) {

@@ -66,7 +66,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         RequestModel requestModel = requestModelList.get(position);
         holder.tvFullName.setText(requestModel.getUserName());
         String photoName = requestModel.getPhotoName();
-        StorageReference fileRef = FirebaseStorage.getInstance().getReference().child(PROFILE_IMAGES_FOLDER + photoName.substring(photoName.lastIndexOf("/")));
+        StorageReference fileRef = FirebaseStorage.getInstance().getReference().child(PROFILE_IMAGES_FOLDER + (!photoName.equals("") ? photoName.substring(photoName.lastIndexOf("/")) : ""));
         fileRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {

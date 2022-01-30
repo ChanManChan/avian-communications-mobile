@@ -69,73 +69,75 @@ public class FindFragment extends Fragment {
 
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child(USERS);
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        databaseReferenceRequests = FirebaseDatabase.getInstance().getReference().child(REQUESTS).child(currentUser.getUid());
-        progressBar.setVisibility(View.VISIBLE);
+        if (currentUser != null) {
+            databaseReferenceRequests = FirebaseDatabase.getInstance().getReference().child(REQUESTS).child(currentUser.getUid());
+            progressBar.setVisibility(View.VISIBLE);
 
-        databaseReferenceRequests.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Query query = databaseReference.orderByChild(NAME);
-                query.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        findModelList.clear();
-                        for (DataSnapshot ds : snapshot.getChildren()) {
-                            String userId = ds.getKey();
+            databaseReferenceRequests.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    Query query = databaseReference.orderByChild(NAME);
+                    query.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            findModelList.clear();
+                            for (DataSnapshot ds : snapshot.getChildren()) {
+                                String userId = ds.getKey();
 
-                            if (userId != null && userId.equals(currentUser.getUid())) {
-                                continue;
-                            }
+                                if (userId != null && userId.equals(currentUser.getUid())) {
+                                    continue;
+                                }
 
-                            Object nameObject = ds.child(NAME).getValue();
-                            Object photoObject = ds.child(PHOTO).getValue();
+                                Object nameObject = ds.child(NAME).getValue();
+                                Object photoObject = ds.child(PHOTO).getValue();
 
-                            if (nameObject != null && photoObject != null && userId != null) {
-                                String fullName = nameObject.toString();
-                                String photoName = photoObject.toString();
+                                if (nameObject != null && photoObject != null && userId != null) {
+                                    String fullName = nameObject.toString();
+                                    String photoName = photoObject.toString();
 
-                                databaseReferenceRequests.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                        if (snapshot.exists()) {
-                                            Object requestTypeObject = snapshot.child(REQUEST_TYPE).getValue();
-                                            if (requestTypeObject != null) {
-                                                String requestType = requestTypeObject.toString();
-                                                if (requestType.equals(REQUEST_STATUS_SENT)) {
-                                                    findModelList.add(new FindModel(fullName, photoName, userId, true));
-                                                    findAdapter.notifyDataSetChanged();
+                                    databaseReferenceRequests.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            if (snapshot.exists()) {
+                                                Object requestTypeObject = snapshot.child(REQUEST_TYPE).getValue();
+                                                if (requestTypeObject != null) {
+                                                    String requestType = requestTypeObject.toString();
+                                                    if (requestType.equals(REQUEST_STATUS_SENT)) {
+                                                        findModelList.add(new FindModel(fullName, photoName, userId, true));
+                                                        findAdapter.notifyDataSetChanged();
+                                                    }
                                                 }
+                                            } else {
+                                                findModelList.add(new FindModel(fullName, photoName, userId, false));
+                                                findAdapter.notifyDataSetChanged();
                                             }
-                                        } else {
-                                            findModelList.add(new FindModel(fullName, photoName, userId, false));
-                                            findAdapter.notifyDataSetChanged();
                                         }
-                                    }
 
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError error) {
-                                        progressBar.setVisibility(View.GONE);
-                                    }
-                                });
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+                                            progressBar.setVisibility(View.GONE);
+                                        }
+                                    });
+                                }
                             }
+                            tvEmptyUserList.setVisibility(View.GONE);
+                            progressBar.setVisibility(View.GONE);
                         }
-                        tvEmptyUserList.setVisibility(View.GONE);
-                        progressBar.setVisibility(View.GONE);
-                    }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                        progressBar.setVisibility(View.GONE);
-                        tvEmptyUserList.setVisibility(View.VISIBLE);
-                        Toast.makeText(getContext(), getString(R.string.failed_to_fetch_users, error.getMessage()), Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                            progressBar.setVisibility(View.GONE);
+                            tvEmptyUserList.setVisibility(View.VISIBLE);
+                            Toast.makeText(getContext(), getString(R.string.failed_to_fetch_users, error.getMessage()), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
 
-            }
-        });
+                }
+            });
+        }
     }
 }
