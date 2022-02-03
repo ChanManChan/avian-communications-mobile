@@ -57,7 +57,7 @@
             android:textColor="@color/black"
             android:hint="@string/enter_message"
             android:inputType="textPersonName" />
-C
+
         <ImageView
             android:id="@+id/ivAttachment"
             android:layout_width="wrap_content"

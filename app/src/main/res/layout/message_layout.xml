@@ -37,6 +37,7 @@
                 android:layout_height="wrap_content"
                 android:autoLink="all"
                 android:padding="12dp"
+                android:maxWidth="300dp"
                 android:textColor="@color/white"
                 android:textColorLink="@color/white"
                 tools:text="Hi Nandu" />
@@ -158,6 +159,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="12dp"
+                android:maxWidth="300dp"
                 android:textColor="@color/red_700"
                 tools:text="Hello Chan" />
         </LinearLayout>

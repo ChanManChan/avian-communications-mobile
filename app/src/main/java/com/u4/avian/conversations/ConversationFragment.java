@@ -73,37 +73,50 @@ public class ConversationFragment extends Fragment {
         databaseReferenceUsers = databaseReference.child(NodeNames.USERS);
         if (currentUser != null) {
             DatabaseReference databaseReferenceConversations = databaseReference.child(NodeNames.CONVERSATIONS).child(currentUser.getUid());
-            query = databaseReferenceConversations.orderByChild(NodeNames.TIMESTAMP);
-
-            childEventListener = new ChildEventListener() {
+            databaseReferenceConversations.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                    updateList(snapshot, true, snapshot.getKey());
-                }
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        query = databaseReferenceConversations.orderByChild(NodeNames.TIMESTAMP);
+                        childEventListener = new ChildEventListener() {
+                            @Override
+                            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                                updateList(snapshot, true, snapshot.getKey());
+                            }
 
-                @Override
-                public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                    updateList(snapshot, false, snapshot.getKey());
-                }
+                            @Override
+                            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                                updateList(snapshot, false, snapshot.getKey());
+                            }
 
-                @Override
-                public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+                            @Override
+                            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
 
-                }
+                            }
 
-                @Override
-                public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                            @Override
+                            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
 
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+                            }
+                        };
+
+                        query.addChildEventListener(childEventListener);
+                    } else {
+                        progressBar.setVisibility(View.GONE);
+                        tvEmptyConversationList.setVisibility(View.VISIBLE);
+                    }
                 }
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
+                    progressBar.setVisibility(View.GONE);
+                    tvEmptyConversationList.setVisibility(View.VISIBLE);
                 }
-            };
-
-            query.addChildEventListener(childEventListener);
-            progressBar.setVisibility(View.GONE);
-            tvEmptyConversationList.setVisibility(View.VISIBLE);
+            });
         }
     }
 
